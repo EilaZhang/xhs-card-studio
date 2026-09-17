@@ -6,17 +6,17 @@
 > 装进你的 agent 之后，你只要说「把这篇文章做成小红书图文」，它就会接手。
 
 <p align="center">
-  <img src="docs/preview/01-theme-cream.png" width="19%" alt="奶油蓝（默认）：奶油黄底 + 淡蓝点缀">
-  <img src="docs/preview/02-theme-knowledge.png" width="19%" alt="知识风：纯白底 + 红强调">
-  <img src="docs/preview/03-theme-night.png" width="19%" alt="暗夜：深炭蓝底 + 琥珀强调">
-  <img src="docs/preview/04-theme-sage.png" width="19%" alt="苔绿：浅鼠尾草底 + 苔绿强调">
+  <img src="docs/preview/theme-cream.png" width="19%" alt="奶油蓝（默认）：奶油黄底 + 淡蓝点缀">
+  <img src="docs/preview/theme-knowledge.png" width="19%" alt="知识风：纯白底 + 红强调">
+  <img src="docs/preview/theme-night.png" width="19%" alt="暗夜：深炭蓝底 + 琥珀强调">
+  <img src="docs/preview/theme-sage.png" width="19%" alt="苔绿：浅鼠尾草底 + 苔绿强调">
 </p>
 
 <p align="center"><sub><b>4 套内置皮肤</b> —— 同一份稿件、同一种版式，只有配色在变。</sub></p>
 
 <p align="center">
-  <img src="docs/preview/05-page-content.png" width="26%" alt="内容页：有序列表 + 高亮 + 引用块">
-  <img src="docs/preview/06-page-figure.png" width="26%" alt="配图页：细描边边框">
+  <img src="docs/preview/page-content.png" width="26%" alt="内容页：有序列表 + 高亮 + 引用块">
+  <img src="docs/preview/page-figure.png" width="26%" alt="配图页：细描边边框">
 </p>
 
 <p align="center"><sub>默认皮肤（奶油蓝）的内容页与配图页。以上全部 1080×1440，由本技能生成。</sub></p>
@@ -45,7 +45,7 @@
 | **Obsidian 原生支持** | `![[图.png]]` 嵌入、`==高亮==`、手写数字页码都认。附件从稿件目录逐级向上找，笔记在子目录、图在 vault 根也不用挪 |
 | **三层样式体系** | `base.css` 结构 + 共用基准值 → `themes/*.css` 只写配色 → `frames/*.css` 配图边框。换皮肤不动结构、不动排版 |
 | **4 套内置皮肤** | 奶油蓝 / 知识风 / 暗夜（深色底）/ 苔绿，都能过对比度阈值。新增皮肤只需加一个 css 文件，**不用改代码** |
-| **可视化调参台** | 浏览器打开 `templates/theme-tuner.html`，拖滑杆实时看 4 张真卡片效果，**不需要写 CSS**。调完导出配置，语义引用（`var(--divider)`）会保留 |
+| **可视化调参台** | 浏览器打开 `templates/theme-tuner.html`，一键套用任意内置皮肤再逐项微调，实时看 4 张真卡片效果，**不需要写 CSS**。皮肤清单跟着 `assets/themes/` 目录走，加皮肤不用改它 |
 | **配图边框预设** | `hairline`（细描边）/ `paper`（相纸框）/ `none`（无边框），中英文名都认。边框宽度算进分页权重，不会溢出 |
 | **自动校验** | 出图后读 PNG 头校验尺寸，不符合 1080×1440 直接报错 —— 不给你静默的废图 |
 
@@ -164,17 +164,31 @@ frame: paper            # 这份稿子固定用相纸框
 **第一步：先看总览再决定。** 浏览器打开 [`docs/gallery.html`](docs/gallery.html) ——
 4 套皮肤 × 3 种配图边框全部实时渲染，一眼看出哪种适合这篇稿子。比看十六进制颜色值快得多。
 
-**想微调：用调参台。** 浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式），
-左边拖滑杆选颜色，右边 4 张真实卡片实时变，调完点「复制配置」把结果贴给 agent，或点「下载 theme.css」。
+**想微调：用调参台。** 浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式）。
+顶部「从哪套皮肤起调」列的就是 `assets/themes/` 下真实存在的皮肤，点一下整套套用；
+下面逐项拖滑杆选颜色，右边 4 张真实卡片实时变，调完点「复制配置」把结果贴给 agent，或点「下载 theme.css」。
 
 **或直接改皮肤文件**：`assets/themes/<皮肤>.css` 里只有 12 行配色，每行都有中文注释。
 字号、间距、字体等共用值在 `assets/base.css`（基准值层），皮肤文件里写同名变量即可覆盖。
 全部可调项见 [`references/theming.md`](references/theming.md)。
 
+**加一套皮肤**＝往 `assets/themes/` 丢一个 css 文件（文件头写好 `@theme-meta`），**不用改任何代码**。
+**删一套**＝把它移出那个目录（`mkdir assets/themes/_archive` 后移进去，留档可捞回）。
+两种都别忘刷新生成物：
+
+```bash
+node scripts/build-tuner.mjs     # 调参台的皮肤清单
+node scripts/build-gallery.mjs   # docs/gallery.html
+node scripts/build-preview.mjs   # docs/preview/*.png
+```
+
 > ⚠️ **调参台不会替你判断对比度** —— 浏览器做不到这件事。导出配色后请人工过一遍阈值表
 > （清单和验算命令在 `theming.md` 的「对比度自检」一节）。强调色太浅会导致列表序号、小标签直接隐形。
 >
 > 深色底皮肤特别注意：高亮块的字色是 `--mark-ink`，**必须显式设成深色**。
+>
+> 调参台导出的配置里，**配图边框那三个变量是整段注释掉的** —— 它们归 `assets/frames/` 独占，
+> 写进皮肤文件会让边框色不再跟着皮肤走。这是刻意的，不是导出坏了。
 > 漏了这行会拿到「近白的字压亮黄高亮」，实测只有 1.44:1，等于看不见。
 
 ## 目录结构
@@ -187,13 +201,16 @@ xhs-card-studio/
 │   ├── render.mjs          HTML → PNG（Playwright / Chrome CLI 双引擎）
 │   ├── build-gallery.mjs   生成 docs/gallery.html（视觉模板总览）
 │   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）
+│   ├── build-tuner.mjs     生成 templates/tuner-data.js（调参台的皮肤/边框清单）
 │   └── lib/templates.mjs   皮肤/边框清单的唯一读取入口
 ├── assets/
 │   ├── base.css            结构骨架 + 所有模板共用的基准值（:root）
+│   ├── gallery-shell.css   总览页这个网页自身的配色（不影响出图）
 │   ├── themes/             皮肤（只写配色）：default / 知识风 / 暗夜 / 苔绿
 │   └── frames/             配图边框预设（独占 --img-border-*）：hairline / paper / none
 ├── templates/
-│   └── theme-tuner.html    可视化皮肤调参台
+│   ├── theme-tuner.html    可视化皮肤调参台
+│   └── tuner-data.js       调参台读的清单（**生成物**，别手改）
 ├── references/
 │   ├── authoring.md        稿件写作规范
 │   └── theming.md          挑皮肤 / 改皮肤的完整说明 + 对比度自检
@@ -208,9 +225,15 @@ xhs-card-studio/
 └── outputs/                默认输出位置（已在 .gitignore 里排除）
 ```
 
-> `docs/gallery.html` 和 `docs/preview/` 都是**生成物**：改了配色或边框之后，
-> 跑 `node scripts/build-gallery.mjs && node scripts/build-preview.mjs` 重新生成，
-> 别手工替换图片 —— 历史上就是这么出现过「README 里 3 张旧皮肤 + 1 张新皮肤」的。
+> **改了配色/边框之后要重跑生成物**（三条一起，顺序无所谓）：
+> ```bash
+> node scripts/build-tuner.mjs     # 调参台的皮肤清单
+> node scripts/build-gallery.mjs   # docs/gallery.html
+> node scripts/build-preview.mjs   # docs/preview/*.png
+> ```
+> 别手工替换 README 的图 —— 历史上就是这么出现过「README 里 3 张旧皮肤 + 1 张新皮肤」的。
+> `build-preview.mjs` 跑完会**反过来检查 README** 引用的图是否都存在、alt 是否对得上，
+> 对不上会直接报错退出，不让错图悄悄上线。
 
 ## 已知限制
 

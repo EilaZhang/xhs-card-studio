@@ -47,7 +47,10 @@
 改完直接重新跑 `build-cards.mjs` 就生效 —— CSS 是生成时**内联**进 HTML 的，
 只跑 `render.mjs` 不会应用新样式。
 
-> 不想碰代码：打开 `templates/theme-tuner.html`，拖滑杆选颜色，右边实时看，调完复制配置。
+> **不想碰代码：** 打开 `templates/theme-tuner.html`，拖滑杆选颜色，右边实时看，调完复制配置。
+> 调参台顶部「从哪套皮肤起调」列的就是 `assets/themes/` 下真实存在的皮肤，点一下整套套用。
+> 这份清单来自 `templates/tuner-data.js`（**生成物**）—— 加/删皮肤后跑一次
+> `node scripts/build-tuner.mjs` 刷新，否则调参台里看不到新皮肤。
 
 ## 画布
 
@@ -218,10 +221,24 @@ node scripts/build-cards.mjs 稿件.md                   # 不写 = 默认 hairl
 
 **调参台**里「配图边框（一键切换）」那组按钮，点一下就是这三个预设，实时预览。
 
-> **从调参台导出配置时，`--img-border-color` 的语义引用会保留**（导出成 `var(--divider)` / `var(--card-bg)`，
-> 不是解析后的 hex）。这样你把导出的配置写进皮肤后，边框色仍会跟着分隔线/底色同步。
-> 手动调过颜色（不等于这两个变量的当前值）则原样导出 hex —— 这是 2026-09-15 实测修掉的坑，
-> 修之前导出会把 `var(--divider)` 拍平成 `#a5c0db`，换皮肤时边框色就不同步了。
+> **从调参台导出的配置里，配图边框那三个变量是「整段注释掉」的** —— 导出结果长这样：
+>
+> ```css
+> :root { /* 皮肤变量 */ }
+>
+> /* ---- 配图边框（整段是注释，故意不生效）----
+>    --img-border-w: 40px;
+>    --img-border-color: var(--card-bg);
+>    --img-shadow: 0 14px 34px rgba(23,32,45,.18);
+> -- */
+> ```
+>
+> 原因是这三个变量由 `assets/frames/` 独占（见下）。**写进皮肤文件会把边框色固定成具体色值**，
+> 以后换皮肤时边框就不跟着底色走了。注释掉既保住了你调的值（再导入调参台还能读回来），
+> 又不会在直接粘贴时误伤皮肤文件。想固定这套边框 → 去改或新建 `assets/frames/<名字>.css`。
+>
+> 至于 `--img-border-color` 的语义引用：导出时会保留成 `var(--divider)` / `var(--card-bg)`，
+> 不会拍平成 hex —— 这是 2026-09-15 实测修掉的坑（修之前导出得到 `#a5c0db` 这种死值）。
 
 #### 三个底层变量
 
@@ -314,6 +331,85 @@ theme: 清晨蓝
 > 内置换过名字的皮肤（比如 `知识风` 曾叫「干净深色风」）就是靠 `@aliases` 把旧名字留下来的。
 
 > ⚠️ 做深色底之前先读下一节 —— 只改 `--card-bg` 会得到「深底黑字」，等于看不见。
+
+## 删掉 / 停用一套皮肤或边框
+
+**机制：目录里见 `.css` 就认，没有开关、没有白名单。** `scripts/lib/templates.mjs` 干的就是
+`readdirSync(dir).filter(f => f.endsWith('.css'))`。所以「删除」＝把文件移出那个目录。
+
+三种做法，按你想不想留后路选：
+
+| 做法 | 命令 | 结果 |
+| --- | --- | --- |
+| **移进归档子目录**（推荐） | `mkdir -p assets/themes/_archive` 然后把文件移进去 | 目录名不以 `.css` 结尾 → 自动被忽略。**留档、不删、随时能捞回来** |
+| 改扩展名 | `mv 苔绿.css 苔绿.css.off` | 同上，`endsWith('.css')` 为假。想恢复改回来即可 |
+| 真删 | `git rm assets/themes/苔绿.css` | 干净。`--theme 苔绿` 会报错并列出所有可用项；git 历史里能找回 |
+
+删掉之后，这套皮肤会从 `--theme` 选项、`docs/gallery.html`、README 预览图里**一起消失** ——
+这是对的，因为清单只有一个来源。
+
+> ⚠️ **边框别删 `hairline`。** 它是 `--frame` 的默认值，删掉之后不传 `--frame` 的稿件会找不到默认边框。
+> 同理 `--img-border-*` 三个变量由 `frames/` **独占**，所以每个边框文件都**必须把三个变量写全**，
+> 少写一个就会漏到上一层的值（或者没有值）。
+
+## 加完 / 删完之后：刷新三样生成物
+
+`docs/` 和 `templates/` 下的三样东西是从 `assets/` 生成的。改了资产不刷新，它们就开始骗人
+（历史上 README 出现过「3 张旧皮肤 + 1 张新皮肤」混在一行，就是这么来的）：
+
+```bash
+node scripts/build-tuner.mjs     # → templates/tuner-data.js（调参台的清单）
+node scripts/build-gallery.mjs   # → docs/gallery.html（总览页）
+node scripts/build-preview.mjs   # → docs/preview/*.png（README 门面图）
+```
+
+三条顺序无所谓，但**别只跑一条**。
+
+### README 预览图的命名规则（别改回去）
+
+| 文件 | 名字怎么来的 |
+| --- | --- |
+| `theme-<slug>.png` | 每套皮肤一张封面，`<slug>` 取自该皮肤 `@theme-meta` 的 `@slug` |
+| `page-content.png` / `page-figure.png` | 默认皮肤的内容页与配图页，演示的是**版式**不是皮肤，所以名字里不带皮肤名 |
+
+**故意不带序号。** 早先叫 `01-theme-cream.png`，序号是按目录顺序现算的（`i + 1`），
+于是「新增一套皮肤」会把后面所有文件挤着改名 —— README 里写的 `05-page-content.png` 那格
+被新皮肤的封面占了，**不报错，只是默默显示成另一张图**。静默错图比裂图难发现得多。
+
+现在文件名只由皮肤自己的 `@slug` 决定，加删皮肤互不影响。
+
+`build-preview.mjs` 跑完会**反过来查 README**，三件事：
+
+1. README 引用的图不存在 → **报错退出**（真上线就是裂图）
+2. 生成的图没被 README 引用 → 告警（通常是加了皮肤忘了更新 README）
+3. 皮肤预览图的 alt 里没提到那套皮肤的名字 → 告警
+   （就是「图是细描边、alt 写着相纸白框」那类错）
+
+## 想改总览页这个网页本身的样子
+
+**别混淆两件事**：卡片出图的配色在 `assets/themes/*.css`（`--card-bg`、`--ink` 那一批）；
+而 `docs/gallery.html` **这个网页自己**长什么样，是另一套变量，在
+**`assets/gallery-shell.css`**（统一 `--gal-*` 前缀）：
+
+```css
+/* assets/gallery-shell.css */
+:root {
+  --gal-page-bg: #f4f5f7;      /* 整页背景 */
+  --gal-surface: #ffffff;      /* 面板底色 */
+  --gal-ink: #1f2430;          /* 主标题 */
+  --gal-ink-faint: #8b93a3;    /* 文件路径、脚注 */
+  --gal-ok: #1c7a4a;           /* 对比度 ✓ */
+  --gal-warn: #b4761a;         /* 对比度 △ */
+  --gal-warnbox-bg: #fff8e6;   /* 黄色告警框 */
+  --gal-infobox-bg: #eef6ff;   /* 蓝色说明框 */
+  /* …共 22 个，文件里有注释 */
+}
+```
+
+想换观感：改这个文件 → `node scripts/build-gallery.mjs`。
+**不用碰 `build-gallery.mjs`** —— 那边的 `<style>` 现在只写排布与缩放，颜色一律
+`var(--gal-*)` 引用。2026-09-17 之前这 20 多个色值硬编码在生成器的模板字符串里，
+想调页面颜色必须改 JS，属于「明明是我的东西我却改不动」。
 
 ## 深色底皮肤怎么调
 

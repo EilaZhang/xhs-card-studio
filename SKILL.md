@@ -2,7 +2,7 @@
 name: xhs-card-studio
 description: 把图文稿件自动生成固定风格的小红书 3:4 图片。当用户要求把文章/稿子/笔记/长文做成小红书图文、生成小红书配图或封面、把 markdown 转成小红书图片、做小红书轮播图/九宫格、或者提到「图文卡片」「3:4 卡片」「1080x1440 出图」「小红书图集」时使用。流程强制三段式：先生成 HTML 供用户确认和修改，确认后才渲染 PNG；内置 4 套皮肤（含深色底）和 3 种配图边框，支持用可视化调参台自定义皮肤。
 metadata:
-  version: 0.7.0
+  version: 0.8.0
   visibility: public
   license: MIT
 ---
@@ -178,13 +178,28 @@ footer: 我的账号名       # 底部信息条左侧文字。写完还不会显
 
 用户说想改风格时，按这个顺序引导：
 
-1. **首选调参台** —— 让用户用浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式）。左边拖滑杆选颜色，右边三张真实卡片实时变，调完点「复制配置」把结果贴回来，或点「下载 theme.css」。
+1. **首选调参台** —— 让用户用浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式）。
+   顶部「从哪套皮肤起调」列的就是 `assets/themes/` 下真实存在的皮肤，点一下整套套用；下面是逐项滑杆/取色器，
+   右边 4 张真实卡片实时变。调完点「复制配置」把结果贴回来，或点「下载 theme.css」。
+   **导出的配置里，配图边框那三个变量是整段注释掉的**（它们归 `assets/frames/` 独占，写进皮肤会让边框色不再跟皮肤走）——
+   这是刻意设计，不用当成 bug 去「修好」它。
 2. **拿到配置后** —— 写入 `assets/themes/<目标皮肤>.css`（覆盖对应变量即可），或者另存一份 `assets/themes/<新名字>.css`，之后用 `--theme <新名字>` 调用。
    **新皮肤记得在文件头部写好 `@theme-meta`**（名字/别名/摘要/适用场景）—— 别名表和总览页都从这里读，写了才认得出。
 3. **有参考图** —— 让用户发参考图或参考链接，照着提取配色和字号感，直接改目标皮肤的 css。
 4. **高级用户** —— 直接改 `assets/themes/<皮肤>.css`（只有 12 行配色，每行都有中文注释）。
    `assets/base.css` 是「结构 + 所有皮肤共用的基准值」，改字号/间距/字体也是改那里，一般不用动结构部分。
 5. **想换风格但拿不准** —— 先打开 `docs/gallery.html` 看 4 套皮肤 × 3 种边框的实际效果，再决定往哪个方向调。
+
+**加/删皮肤或边框之后**，三样生成物都要刷新，否则 README 和调参台会开始骗人：
+
+```bash
+node scripts/build-tuner.mjs     # 调参台的皮肤/边框清单
+node scripts/build-gallery.mjs   # docs/gallery.html
+node scripts/build-preview.mjs   # docs/preview/*.png（跑完会反查 README 引用）
+```
+
+删除皮肤＝把 `assets/themes/<名字>.css` 移出目录（推荐移进 `assets/themes/_archive/`，留档可捞回）；
+**别删 `frames/hairline.css`**，它是 `--frame` 的默认值。详见 [references/theming.md](references/theming.md)。
 
 全部可调变量见 [references/theming.md](references/theming.md)。
 
@@ -240,17 +255,20 @@ xhs-card-studio/
 │   ├── build-cards.mjs     稿件 -> 分页 -> 卡片 HTML
 │   ├── render.mjs          HTML -> PNG（Playwright / Chrome CLI）
 │   ├── build-gallery.mjs   生成 docs/gallery.html（视觉模板总览）
-│   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）
+│   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）+ 反查 README 引用
+│   ├── build-tuner.mjs     生成 templates/tuner-data.js（调参台的皮肤/边框清单）
 │   └── lib/templates.mjs   皮肤/边框清单的唯一读取入口
 ├── assets/
 │   ├── base.css            结构骨架 + 所有皮肤共用的基准值（别动结构）
+│   ├── gallery-shell.css   总览页网页自身的配色（不影响出图）
 │   ├── themes/             皮肤（只写配色）：default(奶油蓝) / 知识风 / 暗夜 / 苔绿
 │   └── frames/             配图边框预设（独占 --img-border-*）：hairline / paper / none
 ├── templates/
-│   └── theme-tuner.html    可视化皮肤调参台
+│   ├── theme-tuner.html    可视化皮肤调参台
+│   └── tuner-data.js       调参台读的皮肤/边框清单（**生成物**）
 ├── references/
 │   ├── authoring.md        稿件写作规范
-│   └── theming.md          挑皮肤 / 改皮肤 + 对比度自检
+│   └── theming.md          挑皮肤 / 改皮肤 / 加皮肤 + 对比度自检
 ├── examples/
 │   ├── demo-gallery.md     三页统一示意（皮肤与边框样张共用）
 │   ├── demo-post.md        示例稿件（纯文字），可直接拿来试跑
@@ -258,10 +276,15 @@ xhs-card-studio/
 │   └── images/             示例配图
 ├── docs/
 │   ├── gallery.html        视觉模板总览（**生成物**）
-│   └── preview/            README 预览图（**生成物**）
+│   └── preview/            README 预览图（**生成物**，文件名 = theme-<slug>.png / page-*.png）
 └── outputs/                默认输出位置
 ```
 
-> 改了皮肤/边框之后，`docs/` 下那两个**生成物**要重跑：
-> `node scripts/build-gallery.mjs && node scripts/build-preview.mjs`。
+> 改了皮肤/边框之后，三个**生成物**都要重跑（顺序无所谓）：
+> ```bash
+> node scripts/build-tuner.mjs     # 调参台的皮肤/边框清单
+> node scripts/build-gallery.mjs   # docs/gallery.html
+> node scripts/build-preview.mjs   # docs/preview/*.png
+> ```
 > 别手工替换 README 的图 —— 历史上就是这么出现过「3 张旧皮肤 + 1 张新皮肤」混在一行里的。
+> `build-preview.mjs` 跑完会反查 README：引用的图不存在就**直接报错退出**，alt 与皮肤对不上会告警。

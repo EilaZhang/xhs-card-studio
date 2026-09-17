@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="P3zDaMjHvmHPuTo9srJwjh">
-<head data-page-node-id="dcvnBkPwVYb9xDhBqmk3GW">
-<meta charset="utf-8" data-page-node-id="MFKY1kenK7rJs40EcXAagn">
-<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="Pek4EPoGlZzvTQRJVTDOVS">
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>皮肤调参台 · xhs-card-studio</title>
 <!--
   用法：直接用浏览器打开本文件（请保持它在 templates/ 目录下，路径不能挪）。
   左边调，右边实时看。调满意 → 点「导出配置」→ 全选复制，粘回
-  assets/themes/default.css 里，或直接丢给 AI 让他帮你写入。
+  assets/themes/<皮肤>.css 里，或直接丢给 AI 让他帮你写入。
+
+  同目录下的 tuner-data.js 是**生成物**（皮肤/边框清单由它提供）。
+  assets/ 下加了皮肤或改了边框名字之后，跑一次：
+    node scripts/build-tuner.mjs
 -->
-<link rel="stylesheet" href="../assets/base.css" data-page-node-id="OmWhr2pTLsiutMbVKOuXPE">
-<link rel="stylesheet" href="../assets/themes/default.css" data-page-node-id="6dLmBUMLqDLDrLRS5En5XS">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/themes/default.css">
 <!-- 配图边框默认用「细描边」，和出图不带 --frame 时一致 -->
-<link rel="stylesheet" href="../assets/frames/hairline.css" data-page-node-id="frameHairlineCss">
+<link rel="stylesheet" href="../assets/frames/hairline.css">
 <style>
   html, body.tuner {
     margin: 0;
@@ -131,7 +135,18 @@
     transition: 0.14s;
   }
   .palette:hover { border-color: #b9c2cd; transform: translateY(-1px); }
-  .palette .dot { width: 13px; height: 13px; border-radius: 50%; }
+  .palette .dot { width: 13px; height: 13px; border-radius: 50%; flex: 0 0 auto; }
+
+  /* 皮肤标签（默认 / 深色底 …），跟着皮肤名一起显示 */
+  .palette .pb {
+    font-style: normal;
+    font-size: 10.5px;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background: #eef1f5;
+    color: #6c7683;
+  }
 
   /* ---------- 按钮 ---------- */
   .btns { display: flex; gap: 8px; margin: 4px 0 14px; }
@@ -227,122 +242,145 @@
   }
 </style>
 </head>
-<body class="tuner" data-page-node-id="Wbz7nxPySBw1C7udP9pg98">
-<div class="tuner-wrap" data-page-node-id="tEcitbdTh3K2avBzhsyojL">
+<body class="tuner">
+<div class="tuner-wrap">
 
-  <aside class="panel" data-page-node-id="ramtDtgULFthfR6fGsqNyq">
-    <h1 data-page-node-id="8diLBcRvDgV9bb424ZFW5j">皮肤调参台</h1>
-    <p class="sub" data-page-node-id="sHjtA3P8KAd7hr04Flgs5Y">右边是真实渲染尺寸（1080×1440）缩小的预览，你在这里调什么，出图就是什么。调完点「导出配置」把结果交给我。</p>
-    <div id="controls" data-page-node-id="DF9Dd8dqISFwN3jSw3dGWE"></div>
+  <aside class="panel">
+    <h1>皮肤调参台</h1>
+    <p class="sub">右边是真实渲染尺寸（1080×1440）缩小的预览，你在这里调什么，出图就是什么。调完点「导出配置」把结果交给我。</p>
+    <div id="controls"></div>
 
-    <div class="group" data-page-node-id="E1ZpABNAn7eBzmfuG2paQX">
-      <h2 data-page-node-id="h1SL3eieZwMbPI2Oooh1iZ">导出</h2>
-      <div class="btns" data-page-node-id="B12BFoqVMOZxAUq9yf87hH">
-        <button class="btn" id="btn-copy" data-page-node-id="4nyafFyDqc3LHtutGSgV2f">复制配置</button>
-        <button class="btn ghost" id="btn-download" data-page-node-id="YfGvhXzQEr90R33ycZJHXJ">下载 theme.css</button>
+    <div class="group">
+      <h2>导出</h2>
+      <div class="btns">
+        <button class="btn" id="btn-copy">复制配置</button>
+        <button class="btn ghost" id="btn-download">下载 theme.css</button>
       </div>
       <textarea id="output" spellcheck="false"></textarea>
-      <p class="hint" data-page-node-id="THrATkDHWjClKwh1zYnbfh">把上面这段整段复制，发给我，或者说「就用这套」即可。也可以点下载，自己覆盖 assets/themes/default.css。</p>
+      <p class="hint">把上面这段整段复制，发给我，或者说「就用这套」即可。也可以点下载，自己覆盖 assets/themes/default.css。</p>
     </div>
 
-    <div class="group" data-page-node-id="0IGaUlGhu9kh0tVSTzN08U">
-      <h2 data-page-node-id="Roz6yhQSgxmaOMpjHJxVhG">从已有皮肤导入</h2>
+    <div class="group">
+      <h2>从已有皮肤导入</h2>
       <textarea id="import" spellcheck="false" placeholder="把 theme.css 的内容整段粘到这里，点下面的按钮即可载入继续改"></textarea>
-      <div class="btns" style="margin-top:10px" data-page-node-id="12ebPV7TgnL1URWztFdKUQ">
-        <button class="btn ghost" id="btn-import" data-page-node-id="EwDwB3UbfLKZPAvgAVaUpA">载入这段配置</button>
-        <button class="btn ghost" id="btn-reset" data-page-node-id="RBkiFGdRN35p3BFETSHl4R">恢复默认</button>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn ghost" id="btn-import">载入这段配置</button>
+        <button class="btn ghost" id="btn-reset">恢复默认</button>
       </div>
     </div>
   </aside>
 
-  <main class="stage" data-page-node-id="3Z6RH4oh5Ocx2oNiMPYRDY">
-    <div class="stage-head" data-page-node-id="bpoGVX5OhiU3HDDYUgdd26">
-      <h2 data-page-node-id="kfzDUhHwv8gc4jTrbUGiRQ">实时预览</h2>
-      <span data-page-node-id="M40ErEToka1cFs2NjIHGZL">封面 / 内容页 / 金句页</span>
+  <main class="stage">
+    <div class="stage-head">
+      <h2>实时预览</h2>
+      <span>封面 / 内容页 / 金句页</span>
     </div>
-    <div class="thumbs" data-page-node-id="2zbbip1mrf4xu51ntOioJR">
+    <div class="thumbs">
 
-      <div class="thumb-item" data-page-node-id="pTBXA64ce0Y0U83E6Vws2g">
-        <div class="thumb" data-page-node-id="uGh1CbuKAlmfWUcX7HAcvc">
-          <section class="card card--cover" data-page-node-id="sXHmEb1WPnobGNyVT70y25">
-            <div class="card__head" data-page-node-id="rvJRfuZ0GfLletkjfiF8Sw">
-              <span class="card__kicker" data-page-node-id="dVpbbFzopEpTboOeAqLwaH">工作方式</span>
-              <h1 class="card__title" data-page-node-id="w9RBtxSt68zEjGjhedNf9B">我把 AI 当同事<br data-page-node-id="Lrzj9wgLy6Bus4PCWEGy8o">用了三个月</h1>
+      <div class="thumb-item">
+        <div class="thumb">
+          <section class="card card--cover">
+            <div class="card__head">
+              <span class="card__kicker">工作方式</span>
+              <h1 class="card__title">我把 AI 当同事<br>用了三个月</h1>
             </div>
-            <div class="card__body" data-page-node-id="5DD2YEBD4MMpSqoCrHfkAD">
-              <div class="card__content" data-page-node-id="GlqmDTdyX7CB13SDp5DrAi">
-                <blockquote data-page-node-id="fI5wEKEcWcoXeIx9ZdIdul"><p data-page-node-id="xnhIgMpfBG00aMv5QRYR7a">结果和我预想的完全不一样</p></blockquote>
+            <div class="card__body">
+              <div class="card__content">
+                <blockquote><p>结果和我预想的完全不一样</p></blockquote>
               </div>
             </div>
           </section>
         </div>
-        <div class="cap" data-page-node-id="LZIqBShAVtBRMVaUWb5dpj">封面</div>
+        <div class="cap">封面</div>
       </div>
 
-      <div class="thumb-item" data-page-node-id="kBcZg2ICugLB9Y45EaPjIH">
-        <div class="thumb" data-page-node-id="5tBS4ajeUVcocOfFAVXFC9">
-          <section class="card card--content card--airy" data-page-node-id="I2WEXmbNZf5l1Ky43WMBdu">
-            <div class="card__head" data-page-node-id="x57Wed67EqY9kRIFCyt5e2">
-              <h2 class="card__title" data-page-node-id="zqYnfoFkTPA3HBfbxAZMlG">我踩过的三个坑</h2>
+      <div class="thumb-item">
+        <div class="thumb">
+          <section class="card card--content card--airy">
+            <div class="card__head">
+              <h2 class="card__title">我踩过的三个坑</h2>
             </div>
-            <div class="card__body" data-page-node-id="uHLsTqYL3ifvC7kcfW8CFJ">
-              <div class="card__content" data-page-node-id="fpkZTPnyvSjLDh3owRGyHz">
-                <p data-page-node-id="JhzOILCMHTac2Ub0qlfoE7">以前遇到不懂的东西，我的第一反应是打开搜索框，翻五六个网页，自己拼答案。</p>
-                <ol data-page-node-id="UVyusWIwgPHjaR2AkIySxa">
-                  <li data-page-node-id="QI2hwICHdiTviAaPjlMKti">以为它什么都知道，结果拿到一堆==看起来很对==、其实没依据的话</li>
-                  <li data-page-node-id="VRIzEJ4NAsZrAUN94fYRNH">一次问太多件事，回答就变得又长又空</li>
-                  <li data-page-node-id="D7POincE7hHMnaFfCv8RHF"><strong data-page-node-id="Wl24Yuk50TCG4MBDgYVRbA">不说背景</strong>，它只能用最平庸的默认答案糊弄我</li>
+            <div class="card__body">
+              <div class="card__content">
+                <p>以前遇到不懂的东西，我的第一反应是打开搜索框，翻五六个网页，自己拼答案。</p>
+                <ol>
+                  <li>以为它什么都知道，结果拿到一堆==看起来很对==、其实没依据的话</li>
+                  <li>一次问太多件事，回答就变得又长又空</li>
+                  <li><strong>不说背景</strong>，它只能用最平庸的默认答案糊弄我</li>
                 </ol>
               </div>
             </div>
           </section>
         </div>
-        <div class="cap" data-page-node-id="LW17y6qI86fuqNYmYvRq4X">内容页</div>
+        <div class="cap">内容页</div>
       </div>
 
-      <div class="thumb-item" data-page-node-id="DsBTbjtVqIJwnBJZjruFHq">
-        <div class="thumb" data-page-node-id="ySRQ1uGFYxygjr9wzvLMAW">
-          <section class="card card--quote" data-page-node-id="SQj9cPrWaoiV3F90vk4916">
-            <div class="card__head" data-page-node-id="ob5dKFbPgQOOUNJXuhcefW">
-              <h2 class="card__title" data-page-node-id="7yZ1LAGELh2QoDAe8bTb62">后来我改了一个习惯</h2>
+      <div class="thumb-item">
+        <div class="thumb">
+          <section class="card card--quote">
+            <div class="card__head">
+              <h2 class="card__title">后来我改了一个习惯</h2>
             </div>
-            <div class="card__body" data-page-node-id="5YJJnz5FD6ivzjMv0ueLtu">
-              <div class="card__content" data-page-node-id="WSFRcyzXOs7IqzpVT7NRdS">
-                <p data-page-node-id="AzxKuVq5SiBU7cWZCiIUxY">每次开口之前，先花三十秒把三件事说清楚：我现在是什么情况、我想要的结果长什么样、哪些东西是不能动的。</p>
-                <blockquote data-page-node-id="JPtYeyXA8cOdI1By66W9cR"><p data-page-node-id="0AFKuXhiSuSfcPMjJC5goE">你省下的那三十秒，最后要花三十分钟补回来。</p></blockquote>
+            <div class="card__body">
+              <div class="card__content">
+                <p>每次开口之前，先花三十秒把三件事说清楚：我现在是什么情况、我想要的结果长什么样、哪些东西是不能动的。</p>
+                <blockquote><p>你省下的那三十秒，最后要花三十分钟补回来。</p></blockquote>
               </div>
             </div>
           </section>
         </div>
-        <div class="cap" data-page-node-id="KSlEPj4jvkiOiqKmpBiANg">金句页</div>
+        <div class="cap">金句页</div>
       </div>
 
-      <div class="thumb-item" data-page-node-id="imgPrevCard">
-        <div class="thumb" data-page-node-id="imgPrevThumb">
-          <section class="card card--content" data-page-node-id="imgPrevSec">
-            <div class="card__head" data-page-node-id="imgPrevHead">
-              <h2 class="card__title" data-page-node-id="imgPrevTitle">配图页</h2>
+      <div class="thumb-item">
+        <div class="thumb">
+          <section class="card card--content">
+            <div class="card__head">
+              <h2 class="card__title">配图页</h2>
             </div>
-            <div class="card__body" data-page-node-id="imgPrevBody">
-              <div class="card__content" data-page-node-id="imgPrevContent">
-                <figure data-page-node-id="imgPrevFig">
-                  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 420'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='rgb(198,220,242)'/><stop offset='1' stop-color='rgb(246,232,200)'/></linearGradient></defs><rect width='640' height='420' fill='url(%23g)'/><circle cx='498' cy='112' r='50' fill='rgb(255,206,120)'/><path d='M0 420 L180 208 L318 336 L452 226 L640 420 Z' fill='rgb(126,158,186)'/><path d='M0 420 L140 306 L286 420 Z' fill='rgb(160,186,206)' opacity='0.75'/></svg>" alt="示例配图" style="max-height:480px" data-page-node-id="imgPrevImg">
-                  <figcaption data-page-node-id="imgPrevCap">这张卡专门用来看图片边框</figcaption>
+            <div class="card__body">
+              <div class="card__content">
+                <figure>
+                  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 420'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='rgb(198,220,242)'/><stop offset='1' stop-color='rgb(246,232,200)'/></linearGradient></defs><rect width='640' height='420' fill='url(%23g)'/><circle cx='498' cy='112' r='50' fill='rgb(255,206,120)'/><path d='M0 420 L180 208 L318 336 L452 226 L640 420 Z' fill='rgb(126,158,186)'/><path d='M0 420 L140 306 L286 420 Z' fill='rgb(160,186,206)' opacity='0.75'/></svg>" alt="示例配图" style="max-height:480px">
+                  <figcaption>这张卡专门用来看图片边框</figcaption>
                 </figure>
               </div>
             </div>
           </section>
         </div>
-        <div class="cap" data-page-node-id="imgPrevLabel">配图页</div>
+        <div class="cap">配图页</div>
       </div>
 
     </div>
   </main>
 </div>
-<div class="toast" id="toast" data-page-node-id="Px7IcckHFSmsskDewD0nkK"></div>
+<div class="toast" id="toast"></div>
 
+<!-- 皮肤/边框清单（生成物）。读不到时下面的脚本会弹提示，不会静默少一块 UI -->
+<script src="tuner-data.js"></script>
 <script>
 (function () {
+  /* ---------------- 皮肤 / 边框清单（来自 tuner-data.js） ---------------- */
+  var TPL = window.__XHS_TPL__ || null;
+  var THEMES = TPL ? TPL.themes : [];
+  var FRAMES = TPL ? TPL.frames : [];
+  /* 所有皮肤出现过的变量名并集。切换皮肤前先清掉这批内联值 ——
+     少了这一步，「暗夜 → 奶油蓝」之后 --mark-ink 会残留在深色值上，
+     因为只有暗夜定义了这个变量，不清理就没人把它改回来。 */
+  var THEME_VAR_KEYS = TPL ? TPL.themeVarKeys : [];
+
+  function warnNoData() {
+    var box = document.createElement('div');
+    box.className = 'hint';
+    box.style.cssText = 'margin:12px 0;padding:10px 12px;border-radius:8px;background:#fff4e5;color:#8a5a12;font-size:12.5px;line-height:1.6';
+    box.innerHTML =
+      '<b>读不到 tuner-data.js</b> —— 皮肤/边框清单由它提供，' +
+      '现在只能靠 default.css 调颜色，没法一键套用其它皮肤。' +
+      '在技能根目录跑一次 <code>node scripts/build-tuner.mjs</code> 就有了。';
+    var host = document.getElementById('controls');
+    if (host) host.parentNode.insertBefore(box, host);
+  }
+
   /* ---------------- 控件定义 ---------------- */
   var FONTS = [
     { label: '微软雅黑（最稳）', value: '"Microsoft YaHei", "PingFang SC", sans-serif' },
@@ -356,7 +394,7 @@
   ];
 
   var CONTROLS = [
-    { group: '一键配色（先挑个底子）', type: 'palettes' },
+    { group: '从哪套皮肤起调', type: 'skins' },
     {
       group: '配色',
       items: [
@@ -364,9 +402,13 @@
         { v: '--ink-strong', label: '标题颜色', type: 'color' },
         { v: '--ink', label: '正文颜色', type: 'color' },
         { v: '--ink-soft', label: '次要文字', type: 'color' },
+        { v: '--ink-faint', label: '图片说明（最浅）', type: 'color' },
         { v: '--accent', label: '强调色', type: 'color' },
         { v: '--accent-soft', label: '强调浅色', type: 'color' },
         { v: '--mark-bg', label: '高亮底色', type: 'color' },
+        /* 高亮块里的字色。浅色皮肤留空即可（回落 --ink-strong），
+           深色底必须显式设成深色，否则白字压亮黄只有 1.44:1，看不见。 */
+        { v: '--mark-ink', label: '高亮块里的字（深色底必设）', type: 'color' },
         { v: '--quote-bg', label: '引用块底色', type: 'color' },
         { v: '--divider', label: '分隔线', type: 'color' }
       ]
@@ -419,22 +461,9 @@
     }
   ];
 
-  var PALETTES = [
-    { name: '赤陶红', accent: '#d9483b', soft: '#fbe9e6', mark: '#ffe9a8', bg: '#ffffff' },
-    { name: '墨蓝', accent: '#2f5d8c', soft: '#e6eef7', mark: '#ffe9a8', bg: '#ffffff' },
-    { name: '松绿', accent: '#2f7d5d', soft: '#e2f1ea', mark: '#fdf0b2', bg: '#ffffff' },
-    { name: '芥黄', accent: '#b8860b', soft: '#fbf0d7', mark: '#ffe08a', bg: '#fffdf7' },
-    { name: '藕粉', accent: '#c2607a', soft: '#fbe7ed', mark: '#ffe9a8', bg: '#fffafb' },
-    { name: '石墨', accent: '#2b2f36', soft: '#eceef1', mark: '#ffe08a', bg: '#ffffff' }
-  ];
-
-  /* 配图边框预设：和 assets/frames/ 里的文件一一对应，点一下就套用。
-     出图时用 --frame 选同一个名字，效果完全一致。 */
-  var FRAMES = [
-    { name: '细描边', w: '8px', color: 'var(--divider)', shadow: 'none', dot: '#b9c6d4' },
-    { name: '相纸白框', w: '40px', color: 'var(--card-bg)', shadow: '0 14px 34px rgba(23,32,45,.18)', dot: '#ffffff' },
-    { name: '无边框', w: '0px', color: 'transparent', shadow: 'none', dot: '#eef1f4' }
-  ];
+  /* 皮肤与边框清单都不再写在这里 —— 由 scripts/build-tuner.mjs 从 assets/ 现读，
+     生成同目录的 tuner-data.js，本文件在上面 load 它（THEMES / FRAMES）。
+     这样「加一套皮肤」不会出现「命令行认得出、调参台里看不见」的脱节。 */
 
   var root = document.documentElement;
   var DEFAULTS = {};
@@ -457,7 +486,7 @@
   /* 有些变量的值本身是「语义引用」——皮肤的 --img-border-color 写的是
      var(--divider) 或 var(--card-bg)，换皮肤时边框自动跟着走。
      但 getComputedStyle 会把 var() 解析成实际色值，直接导出就把它拍平成写死的 hex，
-     用户拿去覆盖皮肤后，边框色就再也不同步了（实测：选「相纸白框」导出得到
+     用户拿去覆盖皮肤后，边框色就再也不同步了（实测：选「相纸框」导出得到
      --img-border-color: #fcf9e6，语义引用丢失）。
      这里在导出时还原：值恰好等于被引用变量的当前值，就写回 var(...) 形式。
      用户手动调过颜色（不等于任何被引用变量）则原样导出 hex。 */
@@ -499,12 +528,25 @@
     toast._t = setTimeout(function () { toastEl.classList.remove('on'); }, 1900);
   }
 
+  /* 有些变量皮肤故意不写，靠 base.css 里的 var(x, 兜底) 生效 —— 目前只有 --mark-ink
+     （不写就跟随 --ink-strong）。这一层只影响**显示**：让色块显示真实生效的颜色，
+     而不是因为读到空值而误导性地显示成黑色。
+     导出时仍按「:root 里到底有没有设」判断，没设就不写那一行，不给皮肤文件添噪音。 */
+  var DISPLAY_FALLBACK = { '--mark-ink': '--ink-strong' };
+
+  function rawVar(name) {
+    var v = readVar(name);
+    if (v) return v;
+    var fb = DISPLAY_FALLBACK[name];
+    return fb ? readVar(fb) : '';
+  }
+
   function toHexIfColor(name) {
     /* 自定义属性的 computed value 已经是解析过的：
        皮肤里写 var(--divider)，这里读到的就是实际色值，不用再跟引用。
        实测 Chrome: getComputedStyle(root).getPropertyValue('--img-border-color')
        → '#e6eaee'（不是 'var(--divider)'）。只有变量压根没定义时才落到兜底黑。 */
-    var v = readVar(name);
+    var v = rawVar(name);
     var m = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
     if (m) return m[0].toLowerCase();
     var rgb = v.match(/^rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/);
@@ -525,36 +567,51 @@
       h.textContent = g.group;
       box.appendChild(h);
 
-      if (g.type === 'palettes') {
-        var wrap = document.createElement('div');
-        wrap.className = 'palettes';
-        PALETTES.forEach(function (p) {
+      if (g.type === 'skins') {
+        if (!THEMES.length) { warnNoData(); return; }
+        var swrap = document.createElement('div');
+        swrap.className = 'palettes';
+        THEMES.forEach(function (t) {
           var b = document.createElement('button');
           b.className = 'palette';
-          b.innerHTML = '<span class="dot" style="background:' + p.accent + '"></span>' + p.name;
+          var dot = t.decls['--accent'] || '#999';
+          b.innerHTML = '<span class="dot" style="background:' + dot + '"></span>' +
+            t.name + (t.badges ? '<em class="pb">' + t.badges + '</em>' : '');
+          b.title = (t.summary || '') + (t.aliases.length ? '\n别名：' + t.aliases.join(' / ') : '');
           b.onclick = function () {
-            setVar('--accent', p.accent);
-            setVar('--accent-soft', p.soft);
-            setVar('--mark-bg', p.mark);
-            setVar('--card-bg', p.bg);
+            /* 先清掉所有皮肤用过的变量，再套这一套 —— 否则只有暗夜定义的
+               --mark-ink 会残留在深色值上，切回浅色皮肤时高亮块的字色不对。 */
+            THEME_VAR_KEYS.forEach(function (k) { root.style.removeProperty(k); });
+            Object.keys(t.decls).forEach(function (k) { setVar(k, t.decls[k]); });
             syncInputs();
             exportConfig();
+            toast('已套用皮肤：' + t.name);
           };
-          wrap.appendChild(b);
+          swrap.appendChild(b);
         });
-        box.appendChild(wrap);
+        box.appendChild(swrap);
+        var shint = document.createElement('p');
+        shint.className = 'hint';
+        shint.style.margin = '8px 0 0';
+        shint.textContent = '套用后可以继续改下面的每一项。这里列的就是 assets/themes/ 下真实存在的皮肤。';
+        box.appendChild(shint);
         host.appendChild(box);
         return;
       }
 
       if (g.type === 'frames') {
+        if (!FRAMES.length) { warnNoData(); return; }
         var fwrap = document.createElement('div');
         fwrap.className = 'palettes';
         FRAMES.forEach(function (f) {
           var fb = document.createElement('button');
           fb.className = 'palette';
-          fb.innerHTML = '<span class="dot" style="background:' + f.dot +
+          /* 色块直接取该边框自己的 --img-border-color。它常常是语义引用
+             （var(--divider) / var(--card-bg)），浏览器会就地解析成当前皮肤的实际色值，
+             所以换皮肤时这个色块也会跟着变 —— 正好说明「边框色跟着皮肤走」。 */
+          fb.innerHTML = '<span class="dot" style="background:' + (f.color || 'transparent') +
             ';box-shadow:inset 0 0 0 2px rgba(23,32,45,.16)"></span>' + f.name;
+          fb.title = f.summary || '';
           fb.onclick = function () {
             setVar('--img-border-w', f.w);
             setVar('--img-border-color', f.color);
@@ -569,7 +626,8 @@
         var fhint = document.createElement('p');
         fhint.className = 'hint';
         fhint.style.margin = '8px 0 0';
-        fhint.textContent = '出图时写同一个名字即可：「相纸白框」→ --frame paper，无边框 → --frame none，不写就是细描边。';
+        fhint.textContent = '出图时写同一个名字即可，例如 --frame ' + (FRAMES[1] ? FRAMES[1].key : 'paper') +
+          '。上面这几个就是 assets/frames/ 下的文件；不写 --frame 时用「细描边」。';
         box.appendChild(fhint);
         host.appendChild(box);
         return;
@@ -664,18 +722,43 @@
   }
 
   /* ---------------- 导出 / 导入 ---------------- */
-  /* 这几个变量没有对应控件，但会随「配图边框」预设变化。
-     导出时一并带上，否则选了相纸白框、导出配置后投影就丢了。 */
-  var EXTRA_VARS = ['--img-shadow'];
+  /* 配图边框的三个变量归 assets/frames/*.css 独占（见 references/theming.md）。
+     它们会随「配图边框」预设变化，但**不能写进皮肤文件** ——
+     写进去之后边框色就被固定成具体色值，不再跟着皮肤的 --divider / --card-bg 走，
+     以后换皮肤边框就跟底色打架了（这是 2026-09-17 修掉的一个真 bug 的成因）。
+     所以导出时把它们从 :root 里摘出来，单独成段并**整段注释掉**：
+     信息不丢（粘回来自检/再导入都还能读），直接粘进皮肤文件也不会生效。
+     想固定一套边框 → 改或新建 assets/frames/<名字>.css。 */
+  var BORDER_VARS = ['--img-border-w', '--img-border-color', '--img-shadow'];
 
   function exportConfig() {
+    var isBorder = {};
+    BORDER_VARS.forEach(function (n) { isBorder[n] = true; });
+
     var lines = [':root {'];
-    var list = allVars().concat(EXTRA_VARS.map(function (name) { return { v: name }; }));
-    list.forEach(function (item) {
+    allVars().forEach(function (item) {
+      if (isBorder[item.v]) return;
       var v = exportValue(item.v);
       if (v) lines.push('  ' + item.v + ': ' + v + ';');
     });
     lines.push('}');
+
+    var borderLines = BORDER_VARS.map(function (n) {
+      var v = exportValue(n);
+      return v ? '   ' + n + ': ' + v + ';' : '';
+    }).filter(Boolean);
+
+    if (borderLines.length) {
+      lines.push('');
+      lines.push('/* ---- 配图边框（整段是注释，故意不生效）---------------------------');
+      lines.push('   下面三个变量由 assets/frames/*.css 独占，**不要写进皮肤文件** ——');
+      lines.push('   写进来边框色就被固定住，不再跟随皮肤的 --divider / --card-bg。');
+      lines.push('   想固定这套边框：改或新建 assets/frames/<名字>.css，');
+      lines.push('   出图时写 --frame <名字>。下面是当前预览用的取值，供参考：');
+      lines.push.apply(lines, borderLines);
+      lines.push('------------------------------------------------------------------ */');
+    }
+
     output.value = lines.join('\n');
   }
 
@@ -731,6 +814,9 @@
 
   document.getElementById('btn-reset').onclick = function () {
     allVars().forEach(function (item) { root.style.removeProperty(item.v); });
+    /* 皮肤带来的变量（比如只有暗夜定义的 --mark-ink）也要一并清掉，
+       否则「恢复默认」之后它还留着，界面看着是奶油蓝、高亮块却还是深色字。 */
+    THEME_VAR_KEYS.forEach(function (k) { root.style.removeProperty(k); });
     syncInputs();
     exportConfig();
     toast('已恢复默认皮肤');
