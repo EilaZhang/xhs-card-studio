@@ -6,13 +6,24 @@
 > 装进你的 agent 之后，你只要说「把这篇文章做成小红书图文」，它就会接手。
 
 <p align="center">
-  <img src="docs/preview/01-cover.png" width="24%" alt="封面卡">
-  <img src="docs/preview/02-content.png" width="24%" alt="内容卡">
-  <img src="docs/preview/03-content.png" width="24%" alt="内容卡">
-  <img src="docs/preview/04-figure.png" width="24%" alt="带配图的卡片（相纸白框）">
+  <img src="docs/preview/01-theme-cream.png" width="19%" alt="奶油蓝（默认）：奶油黄底 + 淡蓝点缀">
+  <img src="docs/preview/02-theme-knowledge.png" width="19%" alt="知识风：纯白底 + 红强调">
+  <img src="docs/preview/03-theme-night.png" width="19%" alt="暗夜：深炭蓝底 + 琥珀强调">
+  <img src="docs/preview/04-theme-sage.png" width="19%" alt="苔绿：浅鼠尾草底 + 苔绿强调">
 </p>
 
-<p align="center"><sub>全部由本技能生成，示例稿件见 <a href="examples/demo-post.md">examples/</a>（1080×1440）。</sub></p>
+<p align="center"><sub><b>4 套内置皮肤</b> —— 同一份稿件、同一种版式，只有配色在变。</sub></p>
+
+<p align="center">
+  <img src="docs/preview/05-page-content.png" width="26%" alt="内容页：有序列表 + 高亮 + 引用块">
+  <img src="docs/preview/06-page-figure.png" width="26%" alt="配图页：细描边边框">
+</p>
+
+<p align="center"><sub>默认皮肤（奶油蓝）的内容页与配图页。以上全部 1080×1440，由本技能生成。</sub></p>
+
+> 📐 **完整视觉模板总览**：4 套皮肤 × 3 种配图边框 = 12 种组合，全都在
+> [`docs/gallery.html`](docs/gallery.html) 里实时渲染（clone 后用浏览器打开；
+> 或跑 `node scripts/build-gallery.mjs` 重新生成）。
 
 ---
 
@@ -32,9 +43,10 @@
 | --- | --- |
 | **智能分页（双轨）** | 自动按卡片实际可用高度切；也可以用 `---`、`#` 标题、手写页码 `1 2 3` 手动控制 |
 | **Obsidian 原生支持** | `![[图.png]]` 嵌入、`==高亮==`、手写数字页码都认。附件从稿件目录逐级向上找，笔记在子目录、图在 vault 根也不用挪 |
-| **三层样式体系** | `base.css` 骨架 + `themes/*.css` 配色 + `frames/*.css` 配图边框。换皮肤不动结构 |
+| **三层样式体系** | `base.css` 结构 + 共用基准值 → `themes/*.css` 只写配色 → `frames/*.css` 配图边框。换皮肤不动结构、不动排版 |
+| **4 套内置皮肤** | 奶油蓝 / 知识风 / 暗夜（深色底）/ 苔绿，都能过对比度阈值。新增皮肤只需加一个 css 文件，**不用改代码** |
 | **可视化调参台** | 浏览器打开 `templates/theme-tuner.html`，拖滑杆实时看 4 张真卡片效果，**不需要写 CSS**。调完导出配置，语义引用（`var(--divider)`）会保留 |
-| **配图边框预设** | `hairline`（细描边）/ `paper`（相纸白框）/ `none`（无边框），中英文名都认。边框宽度算进分页权重，不会溢出 |
+| **配图边框预设** | `hairline`（细描边）/ `paper`（相纸框）/ `none`（无边框），中英文名都认。边框宽度算进分页权重，不会溢出 |
 | **自动校验** | 出图后读 PNG 头校验尺寸，不符合 1080×1440 直接报错 —— 不给你静默的废图 |
 
 ## 安装
@@ -96,14 +108,30 @@ node "$SKILL/scripts/render.mjs" /tmp/demo/cards.html --out /tmp/demo/png
 
 | 参数 | 说明 |
 | --- | --- |
-| `--theme NAME` | 皮肤。默认 `奶油蓝`（奶油黄底 + 淡蓝点缀）；`--theme 知识风` 是白底红强调那套 |
-| `--frame NAME` | 配图边框：`hairline` / `paper` / `none`（也可写中文「细描边」「相纸白框」「无边框」） |
+| `--theme NAME` | 皮肤，见下表。默认 `奶油蓝` |
+| `--frame NAME` | 配图边框：`hairline` 细描边（默认）/ `paper` 相纸框 / `none` 无边框。中文别名「细描边」「相纸框」「无边框」也认 |
 | `--max-chars N` | 每页容量。**不写就按卡片实际可用高度自动算**，一般不用管 |
 | `--text "..."` | 直接传稿件文本，不读文件 |
 | `--only N` | （渲染时）只重出第 N 张，改了一页时省时间 |
 | `--scale 2` | （渲染时）出 2160×2880 |
 
 优先级：**命令行 > 稿件 front-matter > 内置默认值**。
+
+### 内置皮肤
+
+| `--theme` | 说明 | 适合 |
+| --- | --- | --- |
+| `奶油蓝`（默认） | 奶油黄底 + 淡蓝点缀 | 通用内容 / 知识分享 / 日常记录 |
+| `知识风` | 纯白底 + 红强调 | 干货 / 教程 / 方法论 |
+| `暗夜` | 深炭蓝底 + 琥珀强调 | 观点输出 / 深夜向内容 |
+| `苔绿` | 浅鼠尾草底 + 苔绿强调 | 生活记录 / 阅读笔记 / 自然·植物类 |
+
+英文别名也能用：`default` / `knowledge` / `dark` / `sage`（以及 `深色`、`夜色`、`鼠尾草` 等，完整列表见 `--theme` 报错时的提示）。
+**12 种皮肤 × 边框组合的实际效果见 [`docs/gallery.html`](docs/gallery.html)。**
+
+> **新增一套皮肤不用改代码**：`cp assets/themes/default.css assets/themes/你的名字.css`，
+> 改配色，再在文件头部写好 `@theme-meta`（名字/别名/摘要），`--theme 你的名字` 立刻可用。
+> 别名表、命令行提示、总览页全都自动认它。
 
 ## 稿件怎么写
 
@@ -113,7 +141,7 @@ node "$SKILL/scripts/render.mjs" /tmp/demo/cards.html --out /tmp/demo/png
 ---
 title: 文章标题
 kicker: 工作方式        # 封面顶部那行小字
-frame: paper            # 这份稿子固定用相纸白框
+frame: paper            # 这份稿子固定用相纸框
 ---
 
 # 封面标题
@@ -133,14 +161,21 @@ frame: paper            # 这份稿子固定用相纸白框
 
 ## 换风格
 
-**首选：调参台。** 浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式），
+**第一步：先看总览再决定。** 浏览器打开 [`docs/gallery.html`](docs/gallery.html) ——
+4 套皮肤 × 3 种配图边框全部实时渲染，一眼看出哪种适合这篇稿子。比看十六进制颜色值快得多。
+
+**想微调：用调参台。** 浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式），
 左边拖滑杆选颜色，右边 4 张真实卡片实时变，调完点「复制配置」把结果贴给 agent，或点「下载 theme.css」。
 
-**或直接改皮肤文件**：`assets/themes/default.css` 里全是 CSS 变量，每个都有中文注释。
+**或直接改皮肤文件**：`assets/themes/<皮肤>.css` 里只有 12 行配色，每行都有中文注释。
+字号、间距、字体等共用值在 `assets/base.css`（基准值层），皮肤文件里写同名变量即可覆盖。
 全部可调项见 [`references/theming.md`](references/theming.md)。
 
 > ⚠️ **调参台不会替你判断对比度** —— 浏览器做不到这件事。导出配色后请人工过一遍阈值表
 > （清单和验算命令在 `theming.md` 的「对比度自检」一节）。强调色太浅会导致列表序号、小标签直接隐形。
+>
+> 深色底皮肤特别注意：高亮块的字色是 `--mark-ink`，**必须显式设成深色**。
+> 漏了这行会拿到「近白的字压亮黄高亮」，实测只有 1.44:1，等于看不见。
 
 ## 目录结构
 
@@ -149,23 +184,33 @@ xhs-card-studio/
 ├── SKILL.md                技能规范（触发条件、命令、排查表）
 ├── scripts/
 │   ├── build-cards.mjs     稿件 → 分页 → 卡片 HTML
-│   └── render.mjs          HTML → PNG（Playwright / Chrome CLI 双引擎）
+│   ├── render.mjs          HTML → PNG（Playwright / Chrome CLI 双引擎）
+│   ├── build-gallery.mjs   生成 docs/gallery.html（视觉模板总览）
+│   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）
+│   └── lib/templates.mjs   皮肤/边框清单的唯一读取入口
 ├── assets/
-│   ├── base.css            结构骨架（一般别动）
-│   ├── themes/             皮肤：default.css（奶油蓝）/ 知识风.css
-│   └── frames/             配图边框预设：hairline / paper / none
+│   ├── base.css            结构骨架 + 所有模板共用的基准值（:root）
+│   ├── themes/             皮肤（只写配色）：default / 知识风 / 暗夜 / 苔绿
+│   └── frames/             配图边框预设（独占 --img-border-*）：hairline / paper / none
 ├── templates/
 │   └── theme-tuner.html    可视化皮肤调参台
 ├── references/
 │   ├── authoring.md        稿件写作规范
-│   └── theming.md          皮肤变量字典 + 对比度自检
+│   └── theming.md          挑皮肤 / 改皮肤的完整说明 + 对比度自检
 ├── examples/
+│   ├── demo-gallery.md     三页统一示意（皮肤与边框样张都用它）
 │   ├── demo-post.md        示例稿件（纯文字）
 │   ├── demo-figure.md      示例稿件（演示配图边框）
 │   └── images/             示例配图，自包含，不依赖外部文件
-├── docs/preview/           README 用的预览图
+├── docs/
+│   ├── gallery.html        视觉模板总览（**生成物**，别手改）
+│   └── preview/            README 预览图（**生成物**，别手改）
 └── outputs/                默认输出位置（已在 .gitignore 里排除）
 ```
+
+> `docs/gallery.html` 和 `docs/preview/` 都是**生成物**：改了配色或边框之后，
+> 跑 `node scripts/build-gallery.mjs && node scripts/build-preview.mjs` 重新生成，
+> 别手工替换图片 —— 历史上就是这么出现过「README 里 3 张旧皮肤 + 1 张新皮肤」的。
 
 ## 已知限制
 

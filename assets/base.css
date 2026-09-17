@@ -1,8 +1,71 @@
 /* ============================================================
-   xhs-card-studio :: base.css
-   结构与排版骨架 —— 这一层不要动。
-   想改配色/字体/字号，请改 assets/themes/*.css（全部是 CSS 变量）。
+   xhs-card-studio :: base.css  —— 第 1 层：结构 + 基准值
+   ------------------------------------------------------------
+   这一层是「骨架 + 出厂默认」，正常不要动。它包含两部分：
+
+   ① :root 基准值 —— 字号、间距、字体、画布等**所有皮肤共用**的默认值。
+      只写一份。皮肤文件里再写同名变量就是覆盖它。
+      （配色不在这一层：配色是每套皮肤的身份证，必须显式写在皮肤文件里。）
+
+   ② 结构样式 —— 布局、分页、卡片骨架。不含任何具体颜色值。
+
+   级联顺序 = base.css → themes/<皮肤>.css → frames/<边框>.css
+   三层都是 :root / 同名选择器，**后写的赢**。
+
+   想换风格：改 assets/themes/*.css（配色）或加 --frame 参数（配图边框）。
+   想改字号间距：在皮肤文件里覆盖对应变量即可，不用动本文件。
    ============================================================ */
+
+:root {
+  /* ---------- 画布尺寸：小红书 3:4，别乱改 ---------- */
+  --card-w: 1080px;
+  --card-h: 1440px;
+
+  /* ---------- 字体 ----------
+     只能用本机装了的字体，否则出图会静默降级成难看的默认字体。
+     Windows 安全牌：Microsoft YaHei / SimSun / KaiTi / DengXian */
+  --font-display: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+
+  /* ---------- 字号：画布宽 1080px，别拿网页字号来想象 ---------- */
+  --cover-size: 96px;
+  --title-size: 62px;
+  --body-size: 40px;
+  --quote-size: 52px;
+  --kicker-size: 24px;
+  --title-weight: 800;
+  --body-weight: 400;
+
+  /* ---------- 间距 ---------- */
+  --pad-x: 96px;
+  --pad-y: 104px;
+  --gap-head: 44px;
+  --gap-body: 0px;
+  --gap-block: 36px;
+  --li-gap: 20px;
+  --li-indent: 1.5em;
+  --body-leading: 1.78;
+  --body-tracking: 0.01em;
+
+  /* ---------- 细节 ---------- */
+  --radius: 24px;
+  --quote-pad-x: 44px;
+  --quote-pad-y: 40px;
+  --quote-bar: 12px;
+  --img-max-h: 720px;
+  --img-max-h-solo: 1010px;
+  --cover-sub-gap: 44px;   /* 封面主标题与副标题的距离 */
+
+  /* ---------- 底部信息条：默认关闭 ----------
+     想显示账号名/页码，在皮肤文件里把 --foot-display 改成 flex，
+     再在稿件 front-matter 里写 footer: 你的账号名 */
+  --foot-display: none;
+  --end-align: flex-start;
+
+  /* 注意：--img-border-* 三个配图边框变量**不在这里**。
+     它们由 assets/frames/*.css 独占（默认加载 hairline）。
+     这样「边框长什么样」只有一处定义，不会和皮肤里的值打架。 */
+}
 
 *,
 *::before,
@@ -127,10 +190,13 @@ body.is-single .card {
   color: var(--ink-soft);
 }
 
-/* ==高亮== 语法 */
+/* ==高亮== 语法
+   底色 = --mark-bg，字色 = --mark-ink（未设时跟随 --ink-strong，行为同以前）。
+   浅色底：亮底色 + 深字；深色底：亮底色 + **深字**（不能用近白的 --ink-strong，
+   白字压亮黄只有 1.4:1，等于看不见）。深色皮肤务必显式设 --mark-ink。 */
 .card__content mark {
   background: var(--mark-bg);
-  color: var(--ink-strong);
+  color: var(--mark-ink, var(--ink-strong));
   padding: 0 0.16em;
   border-radius: 0.18em;
   font-weight: 700;
@@ -240,8 +306,8 @@ body.is-single .card {
   height: auto;
   margin: 0 auto;              /* 受高度上限回缩后居中，不靠左 */
   border-radius: var(--radius);
-  /* 边框：粗细由 --img-border-w 控制，设 0 就是没有边框。
-     想要相纸白框效果，把颜色设成和卡片底一样的白、粗细调到 36px 以上。 */
+  /* 边框：三个变量由 assets/frames/*.css 定义（默认加载 hairline），
+     粗细设 0 就是没有边框。想要「相纸框」效果，就是 40px + 边框色取 --card-bg。 */
   border: var(--img-border-w, 0px) solid var(--img-border-color, transparent);
   box-shadow: var(--img-shadow, none);
   background: var(--quote-bg); /* 仅图未加载时可见 */

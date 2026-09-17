@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * [INPUT]: Markdown 稿件（文件或 --text 传入）+ assets/base.css + assets/themes/<皮肤>.css
+ * [INPUT]: Markdown 稿件（文件或 --text 传入）+ assets/base.css + assets/themes/<皮肤>.css + assets/frames/<边框>.css
  * [OUTPUT]: <out>/cards.html（预览确认用，含溢出警告）、<out>/slides/pNN.html（逐张出图用）、<out>/plan.json（分页方案）
  * [POS]: 生成层。负责 稿件 -> 分页 -> 卡片 HTML，不负责截图
  * [PROTOCOL]: 变更时更新此头部
@@ -12,7 +12,7 @@
  *   --out DIR        输出目录     默认: <稿件同级>/xhs-cards
  *   --theme NAME     皮肤名       默认: 奶油蓝（assets/themes/default.css）
  *                                 别名 知识风 / knowledge 可切到白底红强调那套
- *   --frame NAME     配图边框     默认: 皮肤自带值（hairline / paper / none）
+ *   --frame NAME     配图边框     默认: hairline（可选 hairline / paper / none）
  *   --max-chars N    每页目标字数 默认: 按卡片实际可用高度自动算（不是固定 260）
  *   --title T        覆盖标题（命令行 > front-matter）
  *   --text "..."     直接传稿件文本，不读文件
@@ -30,32 +30,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadTemplates } from './lib/templates.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ROOT = path.resolve(__dirname, '..');
 
-/**
- * 配图边框风格的别名表。
- * 值 = assets/frames/ 下的文件名；不指定 --frame 时用皮肤文件里的默认值。
- * 中英文都认，省得记参数。
- */
-const FRAME_ALIASES = {
-  hairline: 'hairline', a: 'hairline', 细描边: 'hairline', 细线: 'hairline',
-  paper: 'paper', c: 'paper', 相纸: 'paper', 白框: 'paper', 相纸白框: 'paper',
-  none: 'none', 无: 'none', 无边框: 'none', 不要边框: 'none',
-};
+/** 视觉模板清单（皮肤 + 配图边框）。身份都写在各自的 css 文件头部，见 lib/templates.mjs。 */
+const TPL = loadTemplates(SKILL_ROOT);
+
+/* 皮肤与配图边框的身份（显示名 / 别名 / 摘要 / 适用场景）全部写在各自的 css
+   文件头部，由 scripts/lib/templates.mjs 统一读取（命令行报错清单、总览页都读它），
+   这里不再维护第二份别名表。
+   2026-09-17 整理视觉模板时定的规矩：新增一套模板 = 新增一个 css 文件，代码零改动。 */
 
 /** 默认皮肤名（对应 assets/themes/<名>.css）。2026-09-15 由用户确认改为奶油蓝。 */
 const DEFAULT_THEME = 'default';
 
-/** 皮肤别名 → 实际文件名（不含 .css）。中英文都认；没命中时再按文件名直接找。 */
-const THEME_ALIASES = {
-  default: 'default', 默认: 'default', 奶油蓝: 'default', creamblue: 'default', 'cream-blue': 'default',
-  知识风: '知识风', 干净知识风: '知识风', knowledge: '知识风', clean: '知识风',
-};
-
-/** 报告给用户看的皮肤名（文件名不一定好懂） */
-const THEME_LABELS = { default: '奶油蓝（默认）', 知识风: '知识风（白底红）' };
+/**
+ * 默认配图边框预设（对应 assets/frames/<名>.css）。
+ * 边框层的唯一入口：不传 --frame 时也显式加载一个预设。
+ * （重构前皮肤文件里内联了一份和 hairline 一模一样的默认值，
+ *   等于这个预设是空转的 —— 改它不生效，见 assets/frames/hairline.css 注释。）
+ */
+const DEFAULT_FRAME = 'hairline';
 
 /* ================================================================== *
  * 工具
@@ -67,6 +64,16 @@ const esc = (s) =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+
+/**
+ * 按**显示宽度**补齐空格（全角字符算 2 列）。
+ * 直接用 String.padEnd 是按「字符个数」补的，中英混排的清单会歪一大截。
+ */
+const padDisplay = (s, width) => {
+  const FULL = /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/;
+  const w = [...String(s)].reduce((acc, ch) => acc + (FULL.test(ch) ? 2 : 1), 0);
+  return String(s) + ' '.repeat(Math.max(1, width - w));
+};
 
 /** 去掉空白后的字符数，用于估算排版占位 */
 const countChars = (s) => String(s).replace(/\s/g, '').length;
@@ -219,12 +226,42 @@ function readImageSize(file) {
 }
 
 /** 取 CSS 里的 px / 纯数字变量 */
+/**
+ * 去掉 CSS 注释。
+ *
+ * 变量必须只从**真正生效的声明**里读。注释里难免出现带值的示例，比如
+ * 皮肤注释里教用户「想改字号就写 `--body-size: 44px;`」—— 这种文本
+ * 绝不能被当成声明。实测踩过：就是因为没剥注释，那句示例把
+ * `--body-size` 从 40px 读成了 44px，分页容量跟着从 345 掉到 285，
+ * 而页面上完全看不出来，只是内容提前换页。
+ */
+const stripCssComments = (css) => String(css).replace(/\/\*[\s\S]*?\*\//g, '');
+
+/**
+ * 从拼接后的 CSS（base → theme → frame）里取某个变量的**最后一个**匹配。
+ *
+ * 为什么必须取最后一个：三层都用 :root / 同名选择器，级联规则是**后写的赢**。
+ * 早期实现用的是 String.match（只返回第一个匹配），之所以一直没出问题，
+ * 是因为当时每个变量恰好只在一个文件里定义。2026-09-17 把「所有皮肤共用的
+ * 基准值」收进 base.css 之后，第一个匹配就变成了被覆盖掉的旧值 ——
+ * 后果很阴险：**渲染用 theme 的值、分页却按 base 的值算**，
+ * 页面上不报错，只是内容悄悄溢出或提前换页。
+ */
+const readVarLast = (css, pattern) => {
+  const clean = stripCssComments(css);   // 只剥一次，循环里复用（每次重建字符串会让 lastIndex 错乱）
+  const re = new RegExp(pattern.source, 'g');
+  let m;
+  let last = null;
+  while ((m = re.exec(clean)) !== null) last = m;
+  return last;
+};
+
 const readPxVar = (css, name, fallback) => {
-  const m = css.match(new RegExp(`--${name}\\s*:\\s*([\\d.]+)px`));
+  const m = readVarLast(css, new RegExp(`--${name}\\s*:\\s*([\\d.]+)px`));
   return m ? Number(m[1]) : fallback;
 };
 const readNumVar = (css, name, fallback) => {
-  const m = css.match(new RegExp(`--${name}\\s*:\\s*([\\d.]+)\\s*;`));
+  const m = readVarLast(css, new RegExp(`--${name}\\s*:\\s*([\\d.]+)\\s*;`));
   return m ? Number(m[1]) : fallback;
 };
 
@@ -241,7 +278,7 @@ function annotateImageSizes(blocks, baseDir, themeCss) {
   const bodySize = readPxVar(themeCss, 'body-size', 40);
   const leading = readNumVar(themeCss, 'body-leading', 1.78);
   const gapBlock = readPxVar(themeCss, 'gap-block', 36);
-  // border-box 下边框占实际宽高，粗边框（相纸白框那种）不能忽略
+  // border-box 下边框占实际宽高，粗边框（相纸框那种）不能忽略
   const bw2 = readPxVar(themeCss, 'img-border-w', 0) * 2;
 
   const pxPerChar = (bodySize * bodySize * leading) / contentW;
@@ -774,10 +811,12 @@ function main() {
         '      --theme 皮肤（默认 奶油蓝）:\n' +
         '              奶油蓝 / default      奶油黄底 + 淡蓝点缀（当前默认）\n' +
         '              知识风 / knowledge    白底 + 红强调，原「干净知识风」\n' +
+        '              暗夜   / dark         深炭蓝底 + 琥珀强调（深色底）\n' +
+        '              苔绿   / sage         浅鼠尾草底 + 苔绿强调\n' +
         '              也可指向 assets/themes/ 下自建的 <名字>.css\n' +
         '      --frame 配图边框风格（也可写中文）:\n' +
         '              hairline / 细描边   一条细线框住配图（默认）\n' +
-        '              paper    / 相纸白框   粗白边+投影，像照片贴在相纸上\n' +
+        '              paper    / 相纸框     粗边填卡片底色+投影，像照片贴在相纸上\n' +
         '              none     / 无边框     配图光边贴着版面\n' +
         '      --max-chars 不写时按卡片实际可用高度自动计算，指定数字可强制干预分页密度\n' +
         '      node scripts/build-cards.mjs --text "稿件正文" [--out DIR]'
@@ -802,36 +841,28 @@ function main() {
   // 「显式传 --theme default」不可区分，front-matter 里写了 theme 时命令行
   // 无法强制切回默认皮肤。改成 null 哨兵值后三条路径都可覆盖。
   const themeArg = String(opts.theme ?? meta.theme ?? DEFAULT_THEME).trim();
-  let themeName = THEME_ALIASES[themeArg] || THEME_ALIASES[themeArg.toLowerCase()] || null;
+  let themeName = TPL.themeAliases.get(themeArg.toLowerCase()) || null;
   if (!themeName) {
-    // 别名表没命中，再看是不是用户自建的皮肤文件（theming.md 教的做法）
+    // 别名没命中，再看是不是用户自建的皮肤文件（theming.md 教的做法）
     const probe = path.join(SKILL_ROOT, 'assets', 'themes', `${themeArg}.css`);
     if (fs.existsSync(probe)) themeName = themeArg;
   }
   if (!themeName) {
-    // 曾在文档里把原默认皮肤叫过「深色风」，但它是白底（浅色），名字已改为 知识风。
-    // 这里给个明确解释，别让用户对着「认不出皮肤」发懵。
-    if (/^(深色|暗色|dark)$/i.test(themeArg)) {
-      console.error(
-        '「深色」不是有效皮肤名：原默认皮肤其实是白底（#ffffff + 红强调），不是深色底，' +
-          '现已更名为「知识风」。想用它请写 --theme 知识风。\n' +
-          '（想真正做一套深色底皮肤：cp assets/themes/default.css assets/themes/深色.css，' +
-          '再把 --card-bg 改成深色，参考 references/theming.md 的「深色底皮肤怎么调」）'
-      );
-      process.exit(2);
-    }
-    const available = fs
-      .readdirSync(path.join(SKILL_ROOT, 'assets', 'themes'))
-      .filter((f) => f.endsWith('.css'))
-      .map((f) => f.replace(/\.css$/, ''));
+    // 列可用皮肤时带上摘要，别让用户对着一堆文件名猜哪套是哪套。
+    // （2026-09-17 之前这里有个「深色」的特判报错 —— 当时确实没有深色皮肤，
+    //   而旧文档把白底的知识风误叫「深色风」。现在有了真正的深色皮肤「暗夜」，
+    //   深色/暗色/dark 都直接指向它，那段解释性报错就不需要了。）
+    const available = TPL.themes.map(
+      (t) => `  ${padDisplay(t.key, 10)}${TPL.themeLabel(t.key)}${t.summary ? `  —— ${t.summary}` : ''}`
+    );
     console.error(
-      `认不出皮肤「${themeArg}」。当前可用：${available.join(' / ')}\n` +
-        `别名：${Object.keys(THEME_ALIASES).join(' / ')}\n` +
-        `（也可以自己新建 assets/themes/<名字>.css，再用 --theme <名字>）`
+      `认不出皮肤「${themeArg}」。当前可用：\n${available.join('\n')}\n` +
+        `别名：${TPL.themes.flatMap((t) => t.aliases).join(' / ')}\n` +
+        `（也可以自己新建 assets/themes/<名字>.css，在文件头部写好 @theme-meta，再用 --theme <名字>）`
     );
     process.exit(2);
   }
-  const themeLabel = THEME_LABELS[themeName] || themeName;
+  const themeLabel = TPL.themeLabel(themeName);
 
   const themePath = path.join(SKILL_ROOT, 'assets', 'themes', `${themeName}.css`);
   if (!fs.existsSync(themePath)) {
@@ -854,25 +885,28 @@ function main() {
         '\n         想让它出现，就先转成 PNG/JPG 再引用。'
     );
   }
-  // 配图边框风格：--frame > 稿件 front-matter frame > 皮肤默认值（不额外加载）
-  const frameArg = opts.frame || meta.frame || null;
-  let frameCss = '';
-  let frameLabel = '皮肤默认';
-  if (frameArg) {
-    const raw = String(frameArg).trim();
-    const key = FRAME_ALIASES[raw] || FRAME_ALIASES[raw.toLowerCase()];
-    if (!key) {
-      console.error(`认不出边框风格「${raw}」。可用值：${Object.keys(FRAME_ALIASES).join(' / ')}`);
-      process.exit(2);
-    }
-    const framePath = path.join(SKILL_ROOT, 'assets', 'frames', `${key}.css`);
-    if (!fs.existsSync(framePath)) {
-      console.error(`找不到边框预设文件: ${framePath}`);
-      process.exit(2);
-    }
-    frameCss = fs.readFileSync(framePath, 'utf8');
-    frameLabel = key;
+  // 配图边框风格：--frame > 稿件 front-matter frame > DEFAULT_FRAME
+  // 边框由 assets/frames/ 独占定义（皮肤文件不再内联 --img-border-*），
+  // 所以这里**始终**要加载一个预设，默认 hairline。
+  const explicitFrame = opts.frame || meta.frame || null;
+  const frameRaw = String(explicitFrame || DEFAULT_FRAME).trim();
+  const frameKey = TPL.frameAliases.get(frameRaw.toLowerCase());
+  if (!frameKey) {
+    console.error(
+      `认不出边框风格「${frameRaw}」。可用值：\n` +
+        TPL.frames.map((f) => `  ${padDisplay(f.key, 10)}${f.summary || f.name}`).join('\n') +
+        `\n别名：${TPL.frames.flatMap((f) => f.aliases).join(' / ')}`
+    );
+    process.exit(2);
   }
+  const framePath = path.join(SKILL_ROOT, 'assets', 'frames', `${frameKey}.css`);
+  if (!fs.existsSync(framePath)) {
+    console.error(`找不到边框预设文件: ${framePath}`);
+    process.exit(2);
+  }
+  const frameCss = fs.readFileSync(framePath, 'utf8');
+  // 没显式指定时标上「（默认）」，免得用户以为参数没生效
+  const frameLabel = explicitFrame ? frameKey : `${frameKey}（默认）`;
 
   const themeCss = [
     fs.readFileSync(path.join(SKILL_ROOT, 'assets', 'base.css'), 'utf8'),
@@ -953,7 +987,7 @@ function main() {
   fs.writeFileSync(
     planPath,
     JSON.stringify(
-      { ok: true, title, theme: themeLabel, themeKey: themeName, frame: frameLabel, maxChars, count: pages.length, outDir, preview: cardsPath, plan },
+      { ok: true, title, theme: themeLabel, themeKey: themeName, frame: frameLabel, frameKey, maxChars, count: pages.length, outDir, preview: cardsPath, plan },
       null,
       2
     ),
@@ -968,6 +1002,7 @@ function main() {
         theme: themeLabel,
         themeKey: themeName,
         frame: frameLabel,
+        frameKey,
         maxChars,
         auto: !(opts.maxChars || meta.maxChars),
         count: pages.length,

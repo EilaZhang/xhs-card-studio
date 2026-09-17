@@ -107,7 +107,7 @@ node "$SKILL/scripts/build-cards.mjs" examples/demo-post.md --out outputs/demo
 - 路径**相对于稿件文件所在目录**，不是相对于输出目录
 - 图片独占一段时才能撑满整宽；混在文字段落里会跟着文字走
 - 单张图最高按皮肤设定（默认 720px）等比缩放，**不裁切**
-- 图片的**边框风格**单独用 `--frame` 选（细描边 / 相纸白框 / 无边框），也可以在 front-matter 里写 `frame: paper` 把这个稿子固定成相纸白框；圆角跟着皮肤走
+- 图片的**边框风格**单独用 `--frame` 选（细描边 / 相纸框 / 无边框），也可以在 front-matter 里写 `frame: paper` 把这个稿子固定成相纸框；圆角跟着皮肤走
 - 一页放几张图取决于图的**真实高度**，分页器会算；小图可以两三条挤一页，大截图往往一张就占满
 
 ## 常见坑
@@ -128,6 +128,6 @@ node "$SKILL/scripts/build-cards.mjs" examples/demo-post.md --out outputs/demo
 | 分页位置 | 加 / 删 `---` |
 | 每页容量 | 默认按卡片高度自动算，一般不用管。想手动干预：`--max-chars 300`（切更碎）或 `420`（装更满） |
 | 某页只有一张图、太空 | 会自动试着并进相邻页；还不行就把相邻的文字挪过来 |
-| 配图边框风格 | 出图时加 `--frame paper`（相纸白框）/ `--frame none`（无边框），不写就是细描边 |
+| 配图边框风格 | 出图时加 `--frame paper`（相纸框）/ `--frame none`（无边框），不写就是细描边 |
 | 配色字体 | 打开 `templates/theme-tuner.html` 调，或改 `assets/themes/default.css`（奶油蓝，默认皮肤）。想整套换：`--theme 知识风` |
 | 只重渲某一页 | `render.mjs ... --only 3` |

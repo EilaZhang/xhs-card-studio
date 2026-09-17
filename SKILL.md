@@ -1,8 +1,8 @@
 ---
 name: xhs-card-studio
-description: 把图文稿件自动生成固定风格的小红书 3:4 图片。当用户要求把文章/稿子/笔记/长文做成小红书图文、生成小红书配图或封面、把 markdown 转成小红书图片、做小红书轮播图/九宫格、或者提到「图文卡片」「3:4 卡片」「1080x1440 出图」「小红书图集」时使用。流程强制三段式：先生成 HTML 供用户确认和修改，确认后才渲染 PNG；支持用可视化调参台自定义皮肤。
+description: 把图文稿件自动生成固定风格的小红书 3:4 图片。当用户要求把文章/稿子/笔记/长文做成小红书图文、生成小红书配图或封面、把 markdown 转成小红书图片、做小红书轮播图/九宫格、或者提到「图文卡片」「3:4 卡片」「1080x1440 出图」「小红书图集」时使用。流程强制三段式：先生成 HTML 供用户确认和修改，确认后才渲染 PNG；内置 4 套皮肤（含深色底）和 3 种配图边框，支持用可视化调参台自定义皮肤。
 metadata:
-  version: 0.6.0
+  version: 0.7.0
   visibility: public
   license: MIT
 ---
@@ -53,7 +53,8 @@ node "$SKILL/scripts/render.mjs" <输出目录>/cards.html --out <输出目录>/
 1. 技能装在**用户级**目录（WorkBuddy：`~/.workbuddy/skills/xhs-card-studio/`），**任何工作区都能用**，不用重装、不用复制。
 2. 两步走、中间必须停：**先出 HTML 给他看 → 他点头 → 才渲染 PNG**。这就是他当初的核心要求。
 3. 出图默认落在**当前工作区** `<cwd>/xhs-cards/<稿件名>/`，方便他直接预览和取走。
-4. 会问他的视觉选项只有两个：**皮肤**（默认奶油蓝）和**配图边框**（默认细描边）。嫌麻烦就说「都按默认」。
+4. 会问他的视觉选项只有两个：**皮肤**（默认奶油蓝，另有知识风/暗夜/苔绿）和**配图边框**（默认细描边）。
+   嫌麻烦就说「都按默认」。**拿不准时先把 `docs/gallery.html` 给他看** —— 4 套皮肤 × 3 种边框的实际效果一目了然，比描述色值快得多。
 
 ## 命令
 
@@ -88,8 +89,8 @@ node "$SKILL/scripts/build-cards.mjs" <稿件路径> --out <输出目录>
 | 参数 | 说明 |
 | --- | --- |
 | `--out DIR` | 输出目录 |
-| `--theme NAME` | 皮肤名，默认 `default`（= **奶油蓝**，2026-09-15 起）。别名 `奶油蓝` / `知识风`(`knowledge`) 都认；也可指向 `assets/themes/` 下自建的 `<名字>.css` |
-| `--frame NAME` | 配图边框风格，见下表。不写则用皮肤里的默认值 |
+| `--theme NAME` | 皮肤名，默认 `default`（= **奶油蓝**）。内置 4 套：`奶油蓝`(默认) / `知识风` / `暗夜`(深色底) / `苔绿`。英文别名 `default` / `knowledge` / `dark` / `sage` 也认；也可指向 `assets/themes/` 下自建的 `<名字>.css` |
+| `--frame NAME` | 配图边框风格，见下表。**不写 = 默认 `hairline`（细描边）** |
 | `--max-chars N` | 每页目标容量（含图片折算的当量）。**不写就按卡片实际可用高度自动算**（默认皮肤约 345），一般不用管；页太空调大，页太挤调小 |
 | `--title T` | 覆盖标题（一般不用，front-matter 里的优先） |
 | `--text "..."` | 用户直接在对话里贴的稿子走这个，省得先落盘 |
@@ -100,12 +101,13 @@ node "$SKILL/scripts/build-cards.mjs" <稿件路径> --out <输出目录>
 | 值 | 名字 | 效果 |
 | --- | --- | --- |
 | `hairline` / `细描边` / `a` | 细描边 | 8px 细线框住配图，边框色跟着皮肤分隔线走。**默认** |
-| `paper` / `相纸白框` / `c` | 相纸白框 | 40px 粗边填卡片底色 + 投影，像照片贴在相纸上 |
+| `paper` / `相纸框` / `c` | 相纸框 | 40px 粗边填卡片底色 + 投影，像照片贴在相纸上。浅色皮肤下是白框，深色皮肤（暗夜）下是同色厚框 |
 | `none` / `无边框` | 无边框 | 配图光边贴版面 |
 
-命令行 > front-matter > 皮肤默认值。用户没说就默认细描边，**别自作主张换风格**——这是视觉决策，问一句比猜快。
+命令行 > front-matter > 默认值（`hairline`）。用户没说就默认细描边，**别自作主张换风格**——这是视觉决策，问一句比猜快。
 
-要加新风格：往 `assets/frames/` 放一个只含那三个变量的 css，再在 `build-cards.mjs` 的 `FRAME_ALIASES` 里加个名字映射。
+要加新风格：往 `assets/frames/` 放一个只含那三个变量的 css，文件头部写好 `@frame-meta`（名字/别名/摘要），**代码零改动**。
+同理，加新皮肤只需往 `assets/themes/` 放一个带 `@theme-meta` 头部的 css —— 别再去找代码里的别名表，那已经没有了。
 
 ### 第 2 步：确认
 
@@ -177,9 +179,12 @@ footer: 我的账号名       # 底部信息条左侧文字。写完还不会显
 用户说想改风格时，按这个顺序引导：
 
 1. **首选调参台** —— 让用户用浏览器打开 `templates/theme-tuner.html`（必须保持在该目录下，它靠相对路径读样式）。左边拖滑杆选颜色，右边三张真实卡片实时变，调完点「复制配置」把结果贴回来，或点「下载 theme.css」。
-2. **拿到配置后** —— 写入 `assets/themes/default.css`（覆盖对应变量即可），或者另存一份 `assets/themes/<新名字>.css`，之后用 `--theme <新名字>` 调用。
-3. **有参考图** —— 让用户发参考图或参考链接，照着提取配色和字号感，直接改 `default.css`。
-4. **高级用户** —— 直接改 `assets/themes/default.css`，每个变量都有中文注释。`assets/base.css` 是结构骨架，一般不用动。
+2. **拿到配置后** —— 写入 `assets/themes/<目标皮肤>.css`（覆盖对应变量即可），或者另存一份 `assets/themes/<新名字>.css`，之后用 `--theme <新名字>` 调用。
+   **新皮肤记得在文件头部写好 `@theme-meta`**（名字/别名/摘要/适用场景）—— 别名表和总览页都从这里读，写了才认得出。
+3. **有参考图** —— 让用户发参考图或参考链接，照着提取配色和字号感，直接改目标皮肤的 css。
+4. **高级用户** —— 直接改 `assets/themes/<皮肤>.css`（只有 12 行配色，每行都有中文注释）。
+   `assets/base.css` 是「结构 + 所有皮肤共用的基准值」，改字号/间距/字体也是改那里，一般不用动结构部分。
+5. **想换风格但拿不准** —— 先打开 `docs/gallery.html` 看 4 套皮肤 × 3 种边框的实际效果，再决定往哪个方向调。
 
 全部可调变量见 [references/theming.md](references/theming.md)。
 
@@ -192,6 +197,7 @@ footer: 我的账号名       # 底部信息条左侧文字。写完还不会显
 | `--accent` | 列表序号、封面小标签、列表圆点、引用竖条 | 太浅 → 序号和小标签直接隐形 |
 | `--ink-soft` | 封面副标题、页内小标题 | 太浅 → 封面那句副标题读不清 |
 | `--mark-bg` | `==高亮==` 底色 | 太接近底色 → 高亮看不出 |
+| `--mark-ink` | `==高亮==` 里的字色 | **深色皮肤必查**：不设时跟随 `--ink-strong`（近白），白字压亮黄只有 1.44:1，整块高亮等于没了 |
 
 **判断标准**：强调色和卡片底色之间要能一眼区分。`--accent` 压在同明度的浅底上（比如淡蓝 `#cee1f0` 配奶油白 `#fcf9e6`）对比度只有 1.27:1，等于没写。实测下来 `--accent` 至少要 2.8:1 才够用，3:1 以上更稳。完整阈值表和验算命令见 [references/theming.md](references/theming.md#对比度自检)。
 
@@ -211,9 +217,10 @@ footer: 我的账号名       # 底部信息条左侧文字。写完还不会显
 
 | 现象 | 处理 |
 | --- | --- |
-| **改了 theme.css 但图没变** | CSS 是生成时**内联**进 HTML 的。改完皮肤必须重跑 `build-cards.mjs`，只重跑 `render.mjs` 不会生效 |
+| **改了皮肤 css 但图没变** | CSS 是生成时**内联**进 HTML 的。改完皮肤必须重跑 `build-cards.mjs`，只重跑 `render.mjs` 不会生效 |
 | 找不到浏览器 | 让用户装 Chrome，或跑 `npx playwright install chromium`，或 `--chrome` 指定路径 |
-| 中文变成方块 / 丑字体 | 稿子没问题，是字体栈里的字体本机没装。改 `theme.css` 的 `--font-display` / `--font-body` 为 `"Microsoft YaHei"` |
+| 中文变成方块 / 丑字体 | 稿子没问题，是字体栈里的字体本机没装。改 `assets/base.css` 的 `--font-display` / `--font-body` 为 `"Microsoft YaHei"`（或在皮肤文件里覆盖同名变量） |
+| **`--theme` 说认不出某套皮肤** | 皮肤文件头部的 `@theme-meta` 写漏了或格式不对（要 `@aliases: 名字1, 名字2`）。报错清单会列出脚本实际认到的可用皮肤，对着看 |
 | 提示找不到图片 | 检查 `![]()` 里的相对路径是否相对**稿件文件**，且文件名大小写正确 |
 | 某页被标红溢出 | 加 `---` 手动分页，或调小 `--max-chars`（比如 220） |
 | 预览里卡片顺序不对 | 检查稿件里是否有孤立的一行 `---` 被当成强制分页 |
@@ -231,17 +238,30 @@ xhs-card-studio/
 ├── SKILL.md
 ├── scripts/
 │   ├── build-cards.mjs     稿件 -> 分页 -> 卡片 HTML
-│   └── render.mjs          HTML -> PNG（Playwright / Chrome CLI）
+│   ├── render.mjs          HTML -> PNG（Playwright / Chrome CLI）
+│   ├── build-gallery.mjs   生成 docs/gallery.html（视觉模板总览）
+│   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）
+│   └── lib/templates.mjs   皮肤/边框清单的唯一读取入口
 ├── assets/
-│   ├── base.css            结构骨架（别动）
-│   ├── themes/             皮肤：default.css（奶油蓝，默认）/ 知识风.css
-│   └── frames/             配图边框预设：hairline / paper / none
+│   ├── base.css            结构骨架 + 所有皮肤共用的基准值（别动结构）
+│   ├── themes/             皮肤（只写配色）：default(奶油蓝) / 知识风 / 暗夜 / 苔绿
+│   └── frames/             配图边框预设（独占 --img-border-*）：hairline / paper / none
 ├── templates/
 │   └── theme-tuner.html    可视化皮肤调参台
 ├── references/
 │   ├── authoring.md        稿件写作规范
-│   └── theming.md          皮肤变量字典
+│   └── theming.md          挑皮肤 / 改皮肤 + 对比度自检
 ├── examples/
-│   └── demo-post.md        示例稿件，可直接拿来试跑
+│   ├── demo-gallery.md     三页统一示意（皮肤与边框样张共用）
+│   ├── demo-post.md        示例稿件（纯文字），可直接拿来试跑
+│   ├── demo-figure.md      示例稿件（演示配图边框）
+│   └── images/             示例配图
+├── docs/
+│   ├── gallery.html        视觉模板总览（**生成物**）
+│   └── preview/            README 预览图（**生成物**）
 └── outputs/                默认输出位置
 ```
+
+> 改了皮肤/边框之后，`docs/` 下那两个**生成物**要重跑：
+> `node scripts/build-gallery.mjs && node scripts/build-preview.mjs`。
+> 别手工替换 README 的图 —— 历史上就是这么出现过「3 张旧皮肤 + 1 张新皮肤」混在一行里的。

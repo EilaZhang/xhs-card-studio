@@ -1,85 +1,60 @@
+/* @theme-meta
+   @name:    知识风
+   @slug:    knowledge
+   @badges:  白底红
+   @aliases: 知识风, 干净知识风, knowledge, clean
+   @summary: 纯白底 + 红强调，干净利落
+   @use:     干货 / 教程 / 方法论
+   @order:   2
+*/
+
 /* ============================================================
-   xhs-card-studio :: 知识风 —— 白底红强调
+   xhs-card-studio :: 皮肤 —— 知识风
    ------------------------------------------------------------
-   2026-09-15：这是原来的默认皮肤。用户确认把「奶油蓝」设为默认后，
+   白底 + 红强调，干净利落，适合干货/教程类内容。
+
+   2026-09-15：这曾是默认皮肤。用户把「奶油蓝」设为默认后，
    本皮肤不再自动生效，需要显式指定：
      稿件 front-matter 里写  theme: 知识风
-     或命令行  --theme 知识风    （别名 干净知识风 / knowledge）
+     或命令行  --theme 知识风     （别名 干净知识风 / knowledge / clean）
 
-   注意别被名字绕晕：本皮肤是**白底**（--card-bg: #ffffff）+ 红强调，
-   属于浅色皮肤。想做成真正的深色底，自己新建一套即可（见 theming.md
-   的「深色皮肤的注意事项」）。
+   ⚠️ 别被名字绕晕：本皮肤是**白底**（--card-bg: #ffffff）+ 红强调，
+      属于**浅色**皮肤。想要真正的深色底，用 --theme 暗夜 或照
+      references/theming.md「深色底皮肤怎么调」自己做一套。
 
-   想自己改皮肤？两条路，任选：
-   1. 打开 templates/theme-tuner.html，拖滑杆选颜色，点“复制配置”，
-      把结果粘回本文件即可。
-   2. 直接改下面的变量。每个变量后面都有中文说明，改完重新生成即可。
+   ── 皮肤文件只写配色 ─────────────────────────────────
+   字号、间距、字体等共用值在 assets/base.css 的 :root 里，不在这里重复。
+   想在某一套皮肤上改字号/间距，在这里写同名变量覆盖即可。
+   自检清单见 references/theming.md 的「对比度自检」。
+   ────────────────────────────────────────────────────
 
-   注意：字体只写本机装了的，否则出图会静默降级成难看的默认字体。
-   安全牌：Microsoft YaHei（微软雅黑）、SimSun（宋体）、KaiTi（楷体）、
-   DengXian（等线）。想用思源系列请先自行安装。
+   想自己调：打开 templates/theme-tuner.html
    ============================================================ */
 
 :root {
-  /* ---------- 画布尺寸：小红书 3:4，别乱改 ---------- */
-  --card-w: 1080px;
-  --card-h: 1440px;
+  /* ---------- 配色：换一套皮肤就改这 12 行 ---------- */
 
-  /* ---------- 配色 ---------- */
-  --card-bg: #ffffff;          /* 卡片底色 */
-  --stage-bg: #eceff2;         /* 预览时的页面背景，不出现在图里 */
+  /* 底色 */
+  --card-bg: #ffffff;          /* 卡片底色：纯白 */
+  --stage-bg: #eceff2;         /* 预览时的页面背景，不会出现在图里 */
+
+  /* 文字（由重到轻） */
   --ink-strong: #16181d;       /* 最重的字：标题 */
   --ink: #2f343c;              /* 正文颜色 */
-  --ink-soft: #5c646f;         /* 次要文字 */
+  --ink-soft: #5c646f;         /* 次要文字、封面副标题 */
   --ink-faint: #9aa3ad;        /* 最浅的字：图片说明 */
-  --accent: #d9483b;           /* 强调色：序号、小标签、列表圆点、引用竖条 */
+
+  /* 强调色 */
+  --accent: #d9483b;           /* 序号、小标签、列表圆点、引用竖条 */
   --accent-soft: #fbe9e6;      /* 强调色的浅版本 */
+
+  /* 块底色 */
   --mark-bg: #ffe9a8;          /* ==高亮== 的底色 */
-  --quote-bg: #f7f8fa;         /* 引用/图片块的底色 */
-  --divider: #e6eaee;          /* 分隔线 */
-  --card-shadow: 0 18px 48px rgba(23, 32, 45, 0.10);  /* 预览时的投影，图里看不到 */
+  --quote-bg: #f7f8fa;         /* 引用 / 图片块的底色 */
 
-  /* ---------- 字体 ---------- */
-  --font-display: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;  /* 标题字体 */
-  --font-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;     /* 正文字体 */
+  /* 分隔线：同时决定 hairline 配图边框的颜色 */
+  --divider: #e6eaee;
 
-  /* ---------- 字号：画布宽 1080px，别拿网页字号来想象 ---------- */
-  --cover-size: 96px;          /* 封面主标题 */
-  --title-size: 62px;          /* 内容页标题 */
-  --body-size: 40px;           /* 正文 */
-  --quote-size: 52px;          /* 引用/金句 */
-  --kicker-size: 24px;         /* 顶部小标签（章节名之类） */
-  --title-weight: 800;
-  --body-weight: 400;
-
-  /* ---------- 间距 ---------- */
-  --pad-x: 96px;               /* 左右留白 */
-  --pad-y: 104px;              /* 上下留白 */
-  --gap-head: 44px;            /* 标题区与正文区的距离 */
-  --gap-body: 0px;             /* 正文区上方额外留白 */
-  --gap-block: 36px;           /* 段落之间 */
-  --li-gap: 20px;              /* 列表项之间 */
-  --li-indent: 1.5em;          /* 列表缩进 */
-  --body-leading: 1.78;        /* 正文行高 */
-  --body-tracking: 0.01em;     /* 正文字距 */
-
-  /* ---------- 细节 ---------- */
-  --radius: 24px;              /* 圆角 */
-  --quote-pad-x: 44px;         /* 引用块左右内边距 */
-  --quote-pad-y: 40px;         /* 引用块上下内边距 */
-  --quote-bar: 12px;           /* 引用块左侧竖条粗细 */
-  --img-max-h: 720px;          /* 一段文字里夹带的配图，最大高度 */
-  --img-max-h-solo: 1010px;    /* 整页只有一张图时，允许放到多大 */
-  /* ---------- 配图边框：这是默认值，开 --frame 时会被覆盖 ----------
-     想换风格不用改这里，出图加 --frame paper / none 即可，
-     预设文件都在 assets/frames/ 目录，想加新风格就往那放一个 css */
-  --img-border-w: 8px;                /* 边框粗细，0 = 不要边框 */
-  --img-border-color: var(--divider); /* 边框颜色，跟着分隔线色走 */
-  --img-shadow: none;                 /* 投影，例：0 14px 34px rgba(23,32,45,.18) */
-
-  /* ---------- 底部信息条：默认关闭 ----------
-     想显示账号名/页码，把 --foot-display 改成 flex，
-     然后在稿件里加 front-matter: footer: 你的账号名 */
-  --foot-display: none;
-  --end-align: flex-start;
+  /* 预览时的卡片投影，图里看不到 */
+  --card-shadow: 0 18px 48px rgba(23, 32, 45, 0.10);
 }
