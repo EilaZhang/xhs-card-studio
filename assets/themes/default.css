@@ -1,0 +1,83 @@
+/* ============================================================
+   xhs-card-studio :: 默认皮肤 —— 奶油蓝
+   ------------------------------------------------------------
+   配色由用户在调参台调出，2026-09-15 导出，同日经用户确认设为默认。
+   底色是奶油黄，点缀用淡蓝，整体偏清淡。排版参数沿用原骨架。
+
+   2026-09-15 修正：原 accent (#cee1f0) 压奶油底对比度仅 1.27:1，
+   序号/小标签/引用竖条几乎不可见，已加深为 #6b9bc7 (2.78:1)；
+   ink-soft 同步由 #a5c0db (1.78:1) 加深为 #7d9fbf (2.62:1)。
+   用户已确认 #6b9bc7 保持不变（24px 粗体序号实测可读），
+   如需过 3:1 阈值，备选见 references/theming.md「对比度自检」。
+
+   想换成白底红强调那套：--theme 知识风
+   想自己改配色：打开 templates/theme-tuner.html 调，或直接改下面变量。
+
+   注意：字体只写本机装了的，否则出图会静默降级成难看的默认字体。
+   安全牌：Microsoft YaHei（微软雅黑）、SimSun（宋体）、KaiTi（楷体）、
+   DengXian（等线）。想用思源系列请先自行安装。
+   ============================================================ */
+
+:root {
+  /* ---------- 画布尺寸：小红书 3:4，别乱改 ---------- */
+  --card-w: 1080px;
+  --card-h: 1440px;
+
+  /* ---------- 配色 ---------- */
+  --card-bg: #fcf9e6;          /* 卡片底色：奶油黄 */
+  --stage-bg: #eef3f7;         /* 预览时的页面背景，不出现在图里 */
+  --ink-strong: #212121;       /* 最重的字：标题 */
+  --ink: #212121;              /* 正文颜色 */
+  --ink-soft: #7d9fbf;         /* 次要文字、封面副标题（2.62:1） */
+  --ink-faint: #bcd0e2;        /* 最浅的字：图片说明（装饰性，不需高对比） */
+  --accent: #6b9bc7;           /* 强调色：序号、小标签、列表圆点、引用竖条（2.78:1） */
+  --accent-soft: #e5f0f6;      /* 强调色的浅版本 */
+  --mark-bg: #c6dcf2;          /* ==高亮== 的底色 */
+  --quote-bg: #c6dcf2;         /* 引用/图片块的底色 */
+  --divider: #a5c0db;          /* 分隔线（装饰性，不需高对比） */
+  --card-shadow: 0 18px 48px rgba(23, 32, 45, 0.10);  /* 预览时的投影，图里看不到 */
+
+  /* ---------- 字体 ---------- */
+  --font-display: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --font-body: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+
+  /* ---------- 字号：画布宽 1080px ---------- */
+  --cover-size: 96px;
+  --title-size: 62px;
+  --body-size: 40px;
+  --quote-size: 52px;
+  --kicker-size: 24px;
+  --title-weight: 800;
+  --body-weight: 400;
+
+  /* ---------- 间距 ---------- */
+  --pad-x: 96px;
+  --pad-y: 104px;
+  --gap-head: 44px;
+  --gap-body: 0px;
+  --gap-block: 36px;
+  --li-gap: 20px;
+  --li-indent: 1.5em;
+  --body-leading: 1.78;
+  --body-tracking: 0.01em;
+
+  /* ---------- 细节 ---------- */
+  --radius: 24px;
+  --quote-pad-x: 44px;
+  --quote-pad-y: 40px;
+  --quote-bar: 12px;
+  --img-max-h: 720px;
+  --img-max-h-solo: 1010px;
+  /* ---------- 配图边框：这是默认值，开 --frame 时会被覆盖 ----------
+     想换风格不用改这里，出图加 --frame paper / none 即可，
+     预设文件都在 assets/frames/ 目录，想加新风格就往那放一个 css */
+  --img-border-w: 8px;                /* 边框粗细，0 = 不要边框 */
+  --img-border-color: var(--divider); /* 边框颜色，跟着分隔线色走 */
+  --img-shadow: none;                 /* 投影，例：0 14px 34px rgba(23,32,45,.18) */
+
+  /* ---------- 底部信息条：默认关闭 ----------
+     想显示账号名/页码，把 --foot-display 改成 flex，
+     然后在稿件里加 front-matter: footer: 你的账号名 */
+  --foot-display: none;
+  --end-align: flex-start;
+}

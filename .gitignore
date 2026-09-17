@@ -1,0 +1,14 @@
+# ---- 生成物（重要）----
+# outputs/ 里是稿件渲染结果，含有本机绝对路径和你的私人内容，绝对不要提交。
+outputs/*
+!outputs/.gitkeep
+
+# ---- 临时调试脚本 ----
+outputs/_*.mjs
+*.tmp
+
+# ---- 依赖与系统文件 ----
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

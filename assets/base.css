@@ -1,0 +1,369 @@
+/* ============================================================
+   xhs-card-studio :: base.css
+   结构与排版骨架 —— 这一层不要动。
+   想改配色/字体/字号，请改 assets/themes/*.css（全部是 CSS 变量）。
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--stage-bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 预览模式：多张卡片纵向堆叠，方便一次性确认全部内容 */
+.deck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  padding: 56px 0;
+}
+
+/* 单页模式：卡片铺满视口，截图时不会出现滚动条吃边 */
+body.is-single .deck {
+  gap: 0;
+  padding: 0;
+}
+
+body.is-single {
+  background: var(--card-bg);
+}
+
+body.is-single .card {
+  box-shadow: none;
+}
+
+/* ---------- 卡片本体：严格 3:4 ---------- */
+
+.card {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--card-w);
+  height: var(--card-h);
+  padding: var(--pad-y) var(--pad-x);
+  background: var(--card-bg);
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部装饰：一条细线 + 可选小标签 */
+.card__head {
+  flex: 0 0 auto;
+  margin-bottom: var(--gap-head);
+}
+
+.card__kicker {
+  display: inline-block;
+  margin-bottom: 22px;
+  font-size: var(--kicker-size);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--title-size);
+  font-weight: var(--title-weight);
+  line-height: 1.34;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+}
+
+/* 正文区自动占满剩余高度，内容少时不会浮在中间 */
+.card__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: var(--body-justify, flex-start);
+  padding-top: var(--gap-body);
+  min-height: 0;
+}
+
+.card__content {
+  width: 100%;
+}
+
+.card__content > * {
+  margin: 0 0 var(--gap-block);
+}
+
+.card__content > *:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- 正文元素 ---------- */
+
+.card__content p {
+  font-size: var(--body-size);
+  line-height: var(--body-leading);
+  color: var(--ink);
+  font-weight: var(--body-weight);
+  letter-spacing: var(--body-tracking);
+}
+
+.card__content strong {
+  font-weight: 800;
+  color: var(--ink-strong);
+}
+
+.card__content em {
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* ==高亮== 语法 */
+.card__content mark {
+  background: var(--mark-bg);
+  color: var(--ink-strong);
+  padding: 0 0.16em;
+  border-radius: 0.18em;
+  font-weight: 700;
+}
+
+/* 列表 */
+.card__content ul,
+.card__content ol {
+  margin: 0 0 var(--gap-block);
+  padding: 0;
+  list-style: none;
+}
+
+.card__content li {
+  position: relative;
+  padding-left: var(--li-indent);
+  margin-bottom: var(--li-gap);
+  font-size: var(--body-size);
+  line-height: var(--body-leading);
+  color: var(--ink);
+}
+
+.card__content li:last-child {
+  margin-bottom: 0;
+}
+
+.card__content ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0.42em;
+  top: calc(var(--body-size) * 0.62);
+  width: 0.36em;
+  height: 0.36em;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.card__content ol {
+  counter-reset: li;
+}
+
+.card__content ol > li {
+  padding-left: calc(var(--li-indent) + 0.5em);
+}
+
+.card__content ol > li::before {
+  counter-increment: li;
+  content: counter(li, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: calc(var(--body-size) * 0.16);
+  font-family: var(--font-display);
+  font-size: calc(var(--body-size) * 0.74);
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+/* 引用：左侧粗竖条 + 浅色底 */
+.card__content blockquote {
+  margin: 0 0 var(--gap-block);
+  padding: var(--quote-pad-y) var(--quote-pad-x);
+  background: var(--quote-bg);
+  border-left: var(--quote-bar) solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.card__content blockquote p {
+  font-family: var(--font-display);
+  font-size: var(--quote-size);
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ink-strong);
+}
+
+.card__content blockquote p + p {
+  margin-top: 0.6em;
+}
+
+/* 页内小标题（稿件里的 ## / ###，排在页面主标题之后） */
+.card__content h3,
+.card__content h4 {
+  margin-top: calc(var(--gap-block) * 0.4);
+  margin-bottom: calc(var(--gap-block) * 0.6);
+  font-family: var(--font-display);
+  font-size: calc(var(--body-size) * 1.14);
+  font-weight: 800;
+  line-height: 1.45;
+  color: var(--ink-strong);
+}
+
+.card__content h4 {
+  font-size: calc(var(--body-size) * 1.02);
+  color: var(--ink-soft);
+}
+
+/* 图片 */
+.card__content figure {
+  margin: 0 0 var(--gap-block);
+}
+
+.card__content img {
+  display: block;
+  max-width: 100%;
+  max-height: var(--img-max-h);
+  width: auto;
+  height: auto;
+  margin: 0 auto;              /* 受高度上限回缩后居中，不靠左 */
+  border-radius: var(--radius);
+  /* 边框：粗细由 --img-border-w 控制，设 0 就是没有边框。
+     想要相纸白框效果，把颜色设成和卡片底一样的白、粗细调到 36px 以上。 */
+  border: var(--img-border-w, 0px) solid var(--img-border-color, transparent);
+  box-shadow: var(--img-shadow, none);
+  background: var(--quote-bg); /* 仅图未加载时可见 */
+}
+
+.card__content a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent-soft);
+}
+
+/* 图片说明 */
+.card__content figcaption {
+  margin-top: 0.7em;
+  font-size: calc(var(--body-size) * 0.7);
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* 分割线 */
+.card__content hr {
+  border: 0;
+  height: 1px;
+  background: var(--divider);
+  margin: calc(var(--gap-block) * 0.8) 0;
+}
+
+/* ---------- 卡片变体 ---------- */
+
+/* 封面页：标题与副标题作为一个整体垂直居中，不要各自飘 */
+.card--cover {
+  justify-content: center;
+}
+
+.card--cover .card__head {
+  margin-bottom: 0;
+}
+
+.card--cover .card__body {
+  flex: 0 1 auto;
+  justify-content: flex-start;
+  padding-top: var(--cover-sub-gap, 44px);
+}
+
+.card--cover .card__title {
+  font-size: var(--cover-size);
+  line-height: 1.24;
+  letter-spacing: -0.02em;
+  /* 封面字号大，标题末尾的 emoji / 短词很容易被挤成孤零零的一行。
+     balance 会把各行宽度匀开，消掉这种尾行孤字。不支持的浏览器直接忽略。 */
+  text-wrap: balance;
+}
+
+/* 封面副标题：把引用块剥成一行小字，不抢主标题 */
+.card--cover .card__content blockquote {
+  padding: 0;
+  background: none;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.card--cover .card__content blockquote p {
+  font-size: calc(var(--cover-size) * 0.34);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+/* 金句页：单句大字号居中 */
+.card--quote .card__body {
+  justify-content: center;
+}
+
+.card--quote .card__content p {
+  font-family: var(--font-display);
+  font-size: var(--quote-size);
+  line-height: 1.52;
+  font-weight: 700;
+  color: var(--ink-strong);
+}
+
+/* 整页只有一张配图：放开高度限制，让图占满版面 */
+.card--figure {
+  --img-max-h: var(--img-max-h-solo, 1000px);
+  justify-content: center;
+}
+
+.card--figure .card__body {
+  flex: 0 1 auto;
+  justify-content: flex-start;
+}
+
+/* 内容较少的页：标题与正文作为整体垂直居中，而不是让正文独自飘到中间 */
+.card--airy {
+  justify-content: center;
+}
+
+.card--airy .card__body {
+  flex: 0 1 auto;
+  justify-content: flex-start;
+}
+
+/* 结尾页 */
+.card--end .card__body {
+  justify-content: center;
+  align-items: var(--end-align, flex-start);
+}
+
+.card--end .card__content p {
+  color: var(--ink-soft);
+}
+
+/* 底部信息条：默认关闭（--show-foot 变量控制） */
+.card__foot {
+  flex: 0 0 auto;
+  display: var(--foot-display);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--gap-head);
+  padding-top: 28px;
+  border-top: 1px solid var(--divider);
+  font-size: calc(var(--body-size) * 0.62);
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}

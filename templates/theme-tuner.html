@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="P3zDaMjHvmHPuTo9srJwjh">
+<head data-page-node-id="dcvnBkPwVYb9xDhBqmk3GW">
+<meta charset="utf-8" data-page-node-id="MFKY1kenK7rJs40EcXAagn">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="Pek4EPoGlZzvTQRJVTDOVS">
+<title>皮肤调参台 · xhs-card-studio</title>
+<!--
+  用法：直接用浏览器打开本文件（请保持它在 templates/ 目录下，路径不能挪）。
+  左边调，右边实时看。调满意 → 点「导出配置」→ 全选复制，粘回
+  assets/themes/default.css 里，或直接丢给 AI 让他帮你写入。
+-->
+<link rel="stylesheet" href="../assets/base.css" data-page-node-id="OmWhr2pTLsiutMbVKOuXPE">
+<link rel="stylesheet" href="../assets/themes/default.css" data-page-node-id="6dLmBUMLqDLDrLRS5En5XS">
+<!-- 配图边框默认用「细描边」，和出图不带 --frame 时一致 -->
+<link rel="stylesheet" href="../assets/frames/hairline.css" data-page-node-id="frameHairlineCss">
+<style>
+  html, body.tuner {
+    margin: 0;
+    height: 100%;
+    background: #f4f6f8;
+    color: #1b1f24;
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  }
+  .tuner-wrap {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- 左侧控制面板 ---------- */
+  .panel {
+    flex: 0 0 372px;
+    overflow-y: auto;
+    background: #fff;
+    border-right: 1px solid #e3e8ee;
+    padding: 26px 22px 60px;
+  }
+  .panel h1 {
+    margin: 0 0 6px;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+  }
+  .panel .sub {
+    margin: 0 0 24px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #6c7683;
+  }
+  .group {
+    margin-bottom: 26px;
+  }
+  .group > h2 {
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #8b95a1;
+    border-bottom: 1px solid #eef1f5;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .row label {
+    flex: 1 1 auto;
+    font-size: 13px;
+    color: #3a424d;
+  }
+  .row input[type="color"] {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid #dde3ea;
+    border-radius: 7px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .row input[type="text"] {
+    flex: 0 0 82px;
+    width: 82px;
+    padding: 6px 8px;
+    font: 500 12px/1 ui-monospace, Consolas, monospace;
+    color: #3a424d;
+    border: 1px solid #dde3ea;
+    border-radius: 7px;
+  }
+  .row input[type="range"] {
+    flex: 0 0 132px;
+    width: 132px;
+    accent-color: #d9483b;
+  }
+  .row .val {
+    flex: 0 0 52px;
+    text-align: right;
+    font: 500 12px/1 ui-monospace, Consolas, monospace;
+    color: #6c7683;
+  }
+  .row select {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 7px 8px;
+    font-size: 12.5px;
+    border: 1px solid #dde3ea;
+    border-radius: 7px;
+    background: #fff;
+    color: #3a424d;
+  }
+
+  /* 一键配色 */
+  .palettes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .palette {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px 6px 7px;
+    font-size: 12.5px;
+    color: #3a424d;
+    background: #fff;
+    border: 1px solid #e3e8ee;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: 0.14s;
+  }
+  .palette:hover { border-color: #b9c2cd; transform: translateY(-1px); }
+  .palette .dot { width: 13px; height: 13px; border-radius: 50%; }
+
+  /* ---------- 按钮 ---------- */
+  .btns { display: flex; gap: 8px; margin: 4px 0 14px; }
+  .btn {
+    flex: 1 1 auto;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #1b1f24;
+    border: 0;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: 0.14s;
+  }
+  .btn:hover { opacity: 0.86; }
+  .btn.ghost {
+    color: #3a424d;
+    background: #fff;
+    border: 1px solid #dde3ea;
+  }
+  textarea {
+    width: 100%;
+    min-height: 168px;
+    padding: 12px;
+    font: 400 11.5px/1.65 ui-monospace, Consolas, monospace;
+    color: #2f3640;
+    background: #fbfcfd;
+    border: 1px solid #e3e8ee;
+    border-radius: 10px;
+    resize: vertical;
+  }
+  .hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #8b95a1;
+  }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 34px;
+    transform: translate(-50%, 18px);
+    padding: 10px 20px;
+    font-size: 13px;
+    color: #fff;
+    background: #1b1f24;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.22s;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- 右侧预览区 ---------- */
+  .stage {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding: 30px 34px 70px;
+  }
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .stage-head h2 { margin: 0; font-size: 15px; }
+  .stage-head span { font-size: 12.5px; color: #8b95a1; }
+  .thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+  }
+  .thumb-item { display: flex; flex-direction: column; gap: 9px; }
+  .thumb {
+    --thumb-scale: 0.3;
+    width: calc(1080px * var(--thumb-scale));
+    height: calc(1440px * var(--thumb-scale));
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(23, 32, 45, 0.13);
+    background: #fff;
+  }
+  .thumb .card {
+    transform: scale(var(--thumb-scale));
+    transform-origin: 0 0;
+    box-shadow: none;
+  }
+  .thumb-item > .cap {
+    font-size: 12px;
+    color: #8b95a1;
+    text-align: center;
+  }
+</style>
+</head>
+<body class="tuner" data-page-node-id="Wbz7nxPySBw1C7udP9pg98">
+<div class="tuner-wrap" data-page-node-id="tEcitbdTh3K2avBzhsyojL">
+
+  <aside class="panel" data-page-node-id="ramtDtgULFthfR6fGsqNyq">
+    <h1 data-page-node-id="8diLBcRvDgV9bb424ZFW5j">皮肤调参台</h1>
+    <p class="sub" data-page-node-id="sHjtA3P8KAd7hr04Flgs5Y">右边是真实渲染尺寸（1080×1440）缩小的预览，你在这里调什么，出图就是什么。调完点「导出配置」把结果交给我。</p>
+    <div id="controls" data-page-node-id="DF9Dd8dqISFwN3jSw3dGWE"></div>
+
+    <div class="group" data-page-node-id="E1ZpABNAn7eBzmfuG2paQX">
+      <h2 data-page-node-id="h1SL3eieZwMbPI2Oooh1iZ">导出</h2>
+      <div class="btns" data-page-node-id="B12BFoqVMOZxAUq9yf87hH">
+        <button class="btn" id="btn-copy" data-page-node-id="4nyafFyDqc3LHtutGSgV2f">复制配置</button>
+        <button class="btn ghost" id="btn-download" data-page-node-id="YfGvhXzQEr90R33ycZJHXJ">下载 theme.css</button>
+      </div>
+      <textarea id="output" spellcheck="false"></textarea>
+      <p class="hint" data-page-node-id="THrATkDHWjClKwh1zYnbfh">把上面这段整段复制，发给我，或者说「就用这套」即可。也可以点下载，自己覆盖 assets/themes/default.css。</p>
+    </div>
+
+    <div class="group" data-page-node-id="0IGaUlGhu9kh0tVSTzN08U">
+      <h2 data-page-node-id="Roz6yhQSgxmaOMpjHJxVhG">从已有皮肤导入</h2>
+      <textarea id="import" spellcheck="false" placeholder="把 theme.css 的内容整段粘到这里，点下面的按钮即可载入继续改"></textarea>
+      <div class="btns" style="margin-top:10px" data-page-node-id="12ebPV7TgnL1URWztFdKUQ">
+        <button class="btn ghost" id="btn-import" data-page-node-id="EwDwB3UbfLKZPAvgAVaUpA">载入这段配置</button>
+        <button class="btn ghost" id="btn-reset" data-page-node-id="RBkiFGdRN35p3BFETSHl4R">恢复默认</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="stage" data-page-node-id="3Z6RH4oh5Ocx2oNiMPYRDY">
+    <div class="stage-head" data-page-node-id="bpoGVX5OhiU3HDDYUgdd26">
+      <h2 data-page-node-id="kfzDUhHwv8gc4jTrbUGiRQ">实时预览</h2>
+      <span data-page-node-id="M40ErEToka1cFs2NjIHGZL">封面 / 内容页 / 金句页</span>
+    </div>
+    <div class="thumbs" data-page-node-id="2zbbip1mrf4xu51ntOioJR">
+
+      <div class="thumb-item" data-page-node-id="pTBXA64ce0Y0U83E6Vws2g">
+        <div class="thumb" data-page-node-id="uGh1CbuKAlmfWUcX7HAcvc">
+          <section class="card card--cover" data-page-node-id="sXHmEb1WPnobGNyVT70y25">
+            <div class="card__head" data-page-node-id="rvJRfuZ0GfLletkjfiF8Sw">
+              <span class="card__kicker" data-page-node-id="dVpbbFzopEpTboOeAqLwaH">工作方式</span>
+              <h1 class="card__title" data-page-node-id="w9RBtxSt68zEjGjhedNf9B">我把 AI 当同事<br data-page-node-id="Lrzj9wgLy6Bus4PCWEGy8o">用了三个月</h1>
+            </div>
+            <div class="card__body" data-page-node-id="5DD2YEBD4MMpSqoCrHfkAD">
+              <div class="card__content" data-page-node-id="GlqmDTdyX7CB13SDp5DrAi">
+                <blockquote data-page-node-id="fI5wEKEcWcoXeIx9ZdIdul"><p data-page-node-id="xnhIgMpfBG00aMv5QRYR7a">结果和我预想的完全不一样</p></blockquote>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="cap" data-page-node-id="LZIqBShAVtBRMVaUWb5dpj">封面</div>
+      </div>
+
+      <div class="thumb-item" data-page-node-id="kBcZg2ICugLB9Y45EaPjIH">
+        <div class="thumb" data-page-node-id="5tBS4ajeUVcocOfFAVXFC9">
+          <section class="card card--content card--airy" data-page-node-id="I2WEXmbNZf5l1Ky43WMBdu">
+            <div class="card__head" data-page-node-id="x57Wed67EqY9kRIFCyt5e2">
+              <h2 class="card__title" data-page-node-id="zqYnfoFkTPA3HBfbxAZMlG">我踩过的三个坑</h2>
+            </div>
+            <div class="card__body" data-page-node-id="uHLsTqYL3ifvC7kcfW8CFJ">
+              <div class="card__content" data-page-node-id="fpkZTPnyvSjLDh3owRGyHz">
+                <p data-page-node-id="JhzOILCMHTac2Ub0qlfoE7">以前遇到不懂的东西，我的第一反应是打开搜索框，翻五六个网页，自己拼答案。</p>
+                <ol data-page-node-id="UVyusWIwgPHjaR2AkIySxa">
+                  <li data-page-node-id="QI2hwICHdiTviAaPjlMKti">以为它什么都知道，结果拿到一堆==看起来很对==、其实没依据的话</li>
+                  <li data-page-node-id="VRIzEJ4NAsZrAUN94fYRNH">一次问太多件事，回答就变得又长又空</li>
+                  <li data-page-node-id="D7POincE7hHMnaFfCv8RHF"><strong data-page-node-id="Wl24Yuk50TCG4MBDgYVRbA">不说背景</strong>，它只能用最平庸的默认答案糊弄我</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="cap" data-page-node-id="LW17y6qI86fuqNYmYvRq4X">内容页</div>
+      </div>
+
+      <div class="thumb-item" data-page-node-id="DsBTbjtVqIJwnBJZjruFHq">
+        <div class="thumb" data-page-node-id="ySRQ1uGFYxygjr9wzvLMAW">
+          <section class="card card--quote" data-page-node-id="SQj9cPrWaoiV3F90vk4916">
+            <div class="card__head" data-page-node-id="ob5dKFbPgQOOUNJXuhcefW">
+              <h2 class="card__title" data-page-node-id="7yZ1LAGELh2QoDAe8bTb62">后来我改了一个习惯</h2>
+            </div>
+            <div class="card__body" data-page-node-id="5YJJnz5FD6ivzjMv0ueLtu">
+              <div class="card__content" data-page-node-id="WSFRcyzXOs7IqzpVT7NRdS">
+                <p data-page-node-id="AzxKuVq5SiBU7cWZCiIUxY">每次开口之前，先花三十秒把三件事说清楚：我现在是什么情况、我想要的结果长什么样、哪些东西是不能动的。</p>
+                <blockquote data-page-node-id="JPtYeyXA8cOdI1By66W9cR"><p data-page-node-id="0AFKuXhiSuSfcPMjJC5goE">你省下的那三十秒，最后要花三十分钟补回来。</p></blockquote>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="cap" data-page-node-id="KSlEPj4jvkiOiqKmpBiANg">金句页</div>
+      </div>
+
+      <div class="thumb-item" data-page-node-id="imgPrevCard">
+        <div class="thumb" data-page-node-id="imgPrevThumb">
+          <section class="card card--content" data-page-node-id="imgPrevSec">
+            <div class="card__head" data-page-node-id="imgPrevHead">
+              <h2 class="card__title" data-page-node-id="imgPrevTitle">配图页</h2>
+            </div>
+            <div class="card__body" data-page-node-id="imgPrevBody">
+              <div class="card__content" data-page-node-id="imgPrevContent">
+                <figure data-page-node-id="imgPrevFig">
+                  <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 420'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='rgb(198,220,242)'/><stop offset='1' stop-color='rgb(246,232,200)'/></linearGradient></defs><rect width='640' height='420' fill='url(%23g)'/><circle cx='498' cy='112' r='50' fill='rgb(255,206,120)'/><path d='M0 420 L180 208 L318 336 L452 226 L640 420 Z' fill='rgb(126,158,186)'/><path d='M0 420 L140 306 L286 420 Z' fill='rgb(160,186,206)' opacity='0.75'/></svg>" alt="示例配图" style="max-height:480px" data-page-node-id="imgPrevImg">
+                  <figcaption data-page-node-id="imgPrevCap">这张卡专门用来看图片边框</figcaption>
+                </figure>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="cap" data-page-node-id="imgPrevLabel">配图页</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" data-page-node-id="Px7IcckHFSmsskDewD0nkK"></div>
+
+<script>
+(function () {
+  /* ---------------- 控件定义 ---------------- */
+  var FONTS = [
+    { label: '微软雅黑（最稳）', value: '"Microsoft YaHei", "PingFang SC", sans-serif' },
+    { label: '等线 DengXian', value: '"DengXian", "Microsoft YaHei", sans-serif' },
+    { label: '黑体 SimHei', value: '"SimHei", "Microsoft YaHei", sans-serif' },
+    { label: '宋体 SimSun（衬线）', value: '"SimSun", "Songti SC", serif' },
+    { label: '仿宋 FangSong', value: '"FangSong", "STFangsong", serif' },
+    { label: '楷体 KaiTi', value: '"KaiTi", "STKaiti", serif' },
+    { label: '系统无衬线', value: 'system-ui, -apple-system, "Microsoft YaHei", sans-serif' },
+    { label: '系统衬线', value: 'Georgia, "Songti SC", "SimSun", serif' }
+  ];
+
+  var CONTROLS = [
+    { group: '一键配色（先挑个底子）', type: 'palettes' },
+    {
+      group: '配色',
+      items: [
+        { v: '--card-bg', label: '卡片底色', type: 'color' },
+        { v: '--ink-strong', label: '标题颜色', type: 'color' },
+        { v: '--ink', label: '正文颜色', type: 'color' },
+        { v: '--ink-soft', label: '次要文字', type: 'color' },
+        { v: '--accent', label: '强调色', type: 'color' },
+        { v: '--accent-soft', label: '强调浅色', type: 'color' },
+        { v: '--mark-bg', label: '高亮底色', type: 'color' },
+        { v: '--quote-bg', label: '引用块底色', type: 'color' },
+        { v: '--divider', label: '分隔线', type: 'color' }
+      ]
+    },
+    {
+      group: '字体',
+      items: [
+        { v: '--font-display', label: '标题字体', type: 'font' },
+        { v: '--font-body', label: '正文字体', type: 'font' }
+      ]
+    },
+    {
+      group: '字号',
+      items: [
+        { v: '--cover-size', label: '封面主标题', type: 'range', min: 64, max: 132, step: 2, unit: 'px' },
+        { v: '--title-size', label: '内容页标题', type: 'range', min: 44, max: 84, step: 2, unit: 'px' },
+        { v: '--body-size', label: '正文', type: 'range', min: 28, max: 56, step: 1, unit: 'px' },
+        { v: '--quote-size', label: '引用 / 金句', type: 'range', min: 36, max: 76, step: 2, unit: 'px' },
+        { v: '--kicker-size', label: '顶部小标签', type: 'range', min: 16, max: 34, step: 1, unit: 'px' }
+      ]
+    },
+    {
+      group: '排版',
+      items: [
+        { v: '--body-leading', label: '正文行高', type: 'range', min: 1.4, max: 2.2, step: 0.02, unit: '' },
+        { v: '--pad-x', label: '左右留白', type: 'range', min: 56, max: 160, step: 4, unit: 'px' },
+        { v: '--pad-y', label: '上下留白', type: 'range', min: 56, max: 170, step: 4, unit: 'px' },
+        { v: '--gap-head', label: '标题与正文间距', type: 'range', min: 16, max: 90, step: 2, unit: 'px' },
+        { v: '--gap-block', label: '段落间距', type: 'range', min: 16, max: 64, step: 2, unit: 'px' },
+        { v: '--li-gap', label: '列表项间距', type: 'range', min: 6, max: 40, step: 2, unit: 'px' }
+      ]
+    },
+    {
+      group: '细节',
+      items: [
+        { v: '--radius', label: '圆角', type: 'range', min: 0, max: 56, step: 2, unit: 'px' },
+        { v: '--quote-bar', label: '引用竖条粗细', type: 'range', min: 0, max: 24, step: 1, unit: 'px' },
+        { v: '--quote-pad-y', label: '引用块上下内边距', type: 'range', min: 16, max: 80, step: 2, unit: 'px' },
+        { v: '--quote-pad-x', label: '引用块左右内边距', type: 'range', min: 16, max: 80, step: 2, unit: 'px' }
+      ]
+    },
+    { group: '配图边框（一键切换）', type: 'frames' },
+    {
+      group: '配图微调',
+      items: [
+        { v: '--img-max-h', label: '配图最大高度', type: 'range', min: 320, max: 900, step: 10, unit: 'px' },
+        { v: '--img-border-w', label: '边框粗细', type: 'range', min: 0, max: 48, step: 1, unit: 'px' },
+        { v: '--img-border-color', label: '边框颜色', type: 'color' }
+      ]
+    }
+  ];
+
+  var PALETTES = [
+    { name: '赤陶红', accent: '#d9483b', soft: '#fbe9e6', mark: '#ffe9a8', bg: '#ffffff' },
+    { name: '墨蓝', accent: '#2f5d8c', soft: '#e6eef7', mark: '#ffe9a8', bg: '#ffffff' },
+    { name: '松绿', accent: '#2f7d5d', soft: '#e2f1ea', mark: '#fdf0b2', bg: '#ffffff' },
+    { name: '芥黄', accent: '#b8860b', soft: '#fbf0d7', mark: '#ffe08a', bg: '#fffdf7' },
+    { name: '藕粉', accent: '#c2607a', soft: '#fbe7ed', mark: '#ffe9a8', bg: '#fffafb' },
+    { name: '石墨', accent: '#2b2f36', soft: '#eceef1', mark: '#ffe08a', bg: '#ffffff' }
+  ];
+
+  /* 配图边框预设：和 assets/frames/ 里的文件一一对应，点一下就套用。
+     出图时用 --frame 选同一个名字，效果完全一致。 */
+  var FRAMES = [
+    { name: '细描边', w: '8px', color: 'var(--divider)', shadow: 'none', dot: '#b9c6d4' },
+    { name: '相纸白框', w: '40px', color: 'var(--card-bg)', shadow: '0 14px 34px rgba(23,32,45,.18)', dot: '#ffffff' },
+    { name: '无边框', w: '0px', color: 'transparent', shadow: 'none', dot: '#eef1f4' }
+  ];
+
+  var root = document.documentElement;
+  var DEFAULTS = {};
+  var CAPTURED = [];
+  var output = document.getElementById('output');
+  var toastEl = document.getElementById('toast');
+
+  function allVars() {
+    var list = [];
+    CONTROLS.forEach(function (g) {
+      if (g.items) g.items.forEach(function (i) { list.push(i); });
+    });
+    return list;
+  }
+
+  function readVar(name) {
+    return getComputedStyle(root).getPropertyValue(name).trim();
+  }
+
+  /* 有些变量的值本身是「语义引用」——皮肤的 --img-border-color 写的是
+     var(--divider) 或 var(--card-bg)，换皮肤时边框自动跟着走。
+     但 getComputedStyle 会把 var() 解析成实际色值，直接导出就把它拍平成写死的 hex，
+     用户拿去覆盖皮肤后，边框色就再也不同步了（实测：选「相纸白框」导出得到
+     --img-border-color: #fcf9e6，语义引用丢失）。
+     这里在导出时还原：值恰好等于被引用变量的当前值，就写回 var(...) 形式。
+     用户手动调过颜色（不等于任何被引用变量）则原样导出 hex。 */
+  var SEMANTIC_REFS = {
+    '--img-border-color': ['--divider', '--card-bg']
+  };
+
+  function exportValue(name) {
+    var value = readVar(name);
+    if (!value) return '';
+    var refs = SEMANTIC_REFS[name];
+    if (refs) {
+      for (var i = 0; i < refs.length; i += 1) {
+        if (value.toLowerCase() === readVar(refs[i]).toLowerCase()) {
+          return 'var(' + refs[i] + ')';
+        }
+      }
+    }
+    return value.replace(/\s+/g, ' ');
+  }
+
+  /* 字体栈和下拉项不可能逐字相等（比如默认皮肤多了 Mac 回退字体），
+     所以只比对第一个字体名，匹配不上就落到第一项，避免下拉框空白 */
+  function fontOption(value) {
+    var head = function (s) {
+      return String(s || '').split(',')[0].replace(/["']/g, '').trim().toLowerCase();
+    };
+    var want = head(value);
+    for (var i = 0; i < FONTS.length; i += 1) {
+      if (head(FONTS[i].value) === want) return FONTS[i].value;
+    }
+    return FONTS[0].value;
+  }
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toastEl.classList.remove('on'); }, 1900);
+  }
+
+  function toHexIfColor(name) {
+    /* 自定义属性的 computed value 已经是解析过的：
+       皮肤里写 var(--divider)，这里读到的就是实际色值，不用再跟引用。
+       实测 Chrome: getComputedStyle(root).getPropertyValue('--img-border-color')
+       → '#e6eaee'（不是 'var(--divider)'）。只有变量压根没定义时才落到兜底黑。 */
+    var v = readVar(name);
+    var m = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    if (m) return m[0].toLowerCase();
+    var rgb = v.match(/^rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+    if (rgb) {
+      var h = function (n) { return ('0' + parseInt(n, 10).toString(16)).slice(-2); };
+      return '#' + h(rgb[1]) + h(rgb[2]) + h(rgb[3]);
+    }
+    return '#000000';
+  }
+
+  /* ---------------- 构建控件 ---------------- */
+  function build() {
+    var host = document.getElementById('controls');
+    CONTROLS.forEach(function (g) {
+      var box = document.createElement('div');
+      box.className = 'group';
+      var h = document.createElement('h2');
+      h.textContent = g.group;
+      box.appendChild(h);
+
+      if (g.type === 'palettes') {
+        var wrap = document.createElement('div');
+        wrap.className = 'palettes';
+        PALETTES.forEach(function (p) {
+          var b = document.createElement('button');
+          b.className = 'palette';
+          b.innerHTML = '<span class="dot" style="background:' + p.accent + '"></span>' + p.name;
+          b.onclick = function () {
+            setVar('--accent', p.accent);
+            setVar('--accent-soft', p.soft);
+            setVar('--mark-bg', p.mark);
+            setVar('--card-bg', p.bg);
+            syncInputs();
+            exportConfig();
+          };
+          wrap.appendChild(b);
+        });
+        box.appendChild(wrap);
+        host.appendChild(box);
+        return;
+      }
+
+      if (g.type === 'frames') {
+        var fwrap = document.createElement('div');
+        fwrap.className = 'palettes';
+        FRAMES.forEach(function (f) {
+          var fb = document.createElement('button');
+          fb.className = 'palette';
+          fb.innerHTML = '<span class="dot" style="background:' + f.dot +
+            ';box-shadow:inset 0 0 0 2px rgba(23,32,45,.16)"></span>' + f.name;
+          fb.onclick = function () {
+            setVar('--img-border-w', f.w);
+            setVar('--img-border-color', f.color);
+            setVar('--img-shadow', f.shadow);
+            syncInputs();
+            exportConfig();
+            toast('已套用边框：' + f.name);
+          };
+          fwrap.appendChild(fb);
+        });
+        box.appendChild(fwrap);
+        var fhint = document.createElement('p');
+        fhint.className = 'hint';
+        fhint.style.margin = '8px 0 0';
+        fhint.textContent = '出图时写同一个名字即可：「相纸白框」→ --frame paper，无边框 → --frame none，不写就是细描边。';
+        box.appendChild(fhint);
+        host.appendChild(box);
+        return;
+      }
+
+      g.items.forEach(function (item) {
+        DEFAULTS[item.v] = readVar(item.v);
+        var row = document.createElement('div');
+        row.className = 'row';
+        var lab = document.createElement('label');
+        lab.textContent = item.label;
+        row.appendChild(lab);
+
+        if (item.type === 'color') {
+          var cp = document.createElement('input');
+          cp.type = 'color';
+          cp.value = toHexIfColor(item.v);
+          cp.dataset.var = item.v;
+          cp.oninput = function () { setVar(item.v, cp.value); tx.value = cp.value; exportConfig(); };
+          var tx = document.createElement('input');
+          tx.type = 'text';
+          tx.value = cp.value;
+          tx.oninput = function () {
+            if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(tx.value.trim())) {
+              cp.value = tx.value.trim();
+              setVar(item.v, tx.value.trim());
+              exportConfig();
+            }
+          };
+          row.appendChild(cp);
+          row.appendChild(tx);
+          CAPTURED.push({ item: item, el: cp, tx: tx });
+        } else if (item.type === 'font') {
+          var sel = document.createElement('select');
+          FONTS.forEach(function (f) {
+            var o = document.createElement('option');
+            o.value = f.value;
+            o.textContent = f.label;
+            sel.appendChild(o);
+          });
+          sel.value = fontOption(DEFAULTS[item.v]);
+          sel.onchange = function () { setVar(item.v, sel.value); exportConfig(); };
+          row.appendChild(sel);
+          CAPTURED.push({ item: item, el: sel });
+        } else {
+          var rg = document.createElement('input');
+          rg.type = 'range';
+          rg.min = item.min;
+          rg.max = item.max;
+          rg.step = item.step;
+          rg.value = parseFloat(DEFAULTS[item.v]) || item.min;
+          var vl = document.createElement('span');
+          vl.className = 'val';
+          vl.textContent = rg.value + item.unit;
+          rg.oninput = function () {
+            setVar(item.v, rg.value + item.unit);
+            vl.textContent = rg.value + item.unit;
+            exportConfig();
+          };
+          row.appendChild(rg);
+          row.appendChild(vl);
+          CAPTURED.push({ item: item, el: rg, tx: vl });
+        }
+        box.appendChild(row);
+      });
+
+      host.appendChild(box);
+    });
+  }
+
+  function setVar(name, value) {
+    root.style.setProperty(name, value);
+  }
+
+  function syncInputs() {
+    CAPTURED.forEach(function (c) {
+      var v = readVar(c.item.v);
+      if (c.item.type === 'color') {
+        var hex = toHexIfColor(c.item.v);
+        c.el.value = hex;
+        c.tx.value = hex;
+      } else if (c.item.type === 'font') {
+        c.el.value = fontOption(v);
+      } else {
+        var n = parseFloat(v);
+        if (!isNaN(n)) {
+          c.el.value = n;
+          c.tx.textContent = n + c.item.unit;
+        }
+      }
+    });
+  }
+
+  /* ---------------- 导出 / 导入 ---------------- */
+  /* 这几个变量没有对应控件，但会随「配图边框」预设变化。
+     导出时一并带上，否则选了相纸白框、导出配置后投影就丢了。 */
+  var EXTRA_VARS = ['--img-shadow'];
+
+  function exportConfig() {
+    var lines = [':root {'];
+    var list = allVars().concat(EXTRA_VARS.map(function (name) { return { v: name }; }));
+    list.forEach(function (item) {
+      var v = exportValue(item.v);
+      if (v) lines.push('  ' + item.v + ': ' + v + ';');
+    });
+    lines.push('}');
+    output.value = lines.join('\n');
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast('已复制，粘给我就行');
+      }).catch(function () { fallbackCopy(text); });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    output.focus();
+    output.select();
+    try {
+      document.execCommand('copy');
+      toast('已复制，粘给我就行');
+    } catch (e) {
+      toast('复制失败，请手动全选复制');
+    }
+  }
+
+  document.getElementById('btn-copy').onclick = function () {
+    exportConfig();
+    copyText(output.value);
+  };
+
+  document.getElementById('btn-download').onclick = function () {
+    exportConfig();
+    var blob = new Blob([output.value + '\n'], { type: 'text/css' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'theme.css';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 3000);
+    toast('已下载 theme.css');
+  };
+
+  document.getElementById('btn-import').onclick = function () {
+    var text = document.getElementById('import').value;
+    var n = 0;
+    text.replace(/--([\w-]+)\s*:\s*([^;]+);/g, function (_m, name, val) {
+      setVar('--' + name, val.trim());
+      n += 1;
+      return _m;
+    });
+    syncInputs();
+    exportConfig();
+    toast(n ? '已载入 ' + n + ' 个变量' : '没读到变量，检查一下格式');
+  };
+
+  document.getElementById('btn-reset').onclick = function () {
+    allVars().forEach(function (item) { root.style.removeProperty(item.v); });
+    syncInputs();
+    exportConfig();
+    toast('已恢复默认皮肤');
+  };
+
+  build();
+  exportConfig();
+})();
+</script>
+</body>
+</html>
