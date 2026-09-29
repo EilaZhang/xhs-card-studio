@@ -661,7 +661,14 @@ function inline(text, baseDir) {
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/==([^=]+)==/g, '<mark>$1</mark>');
   s = s.replace(/(?<![*\w])\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
-  s = s.replace(/(?<![_\w])_([^_\n]+)_(?!_)/g, '<em>$1</em>');
+  // `_斜体_`：JS 的 \w 只包含 [A-Za-z0-9_]，汉字不在里面。只写 (?<![_\w]) 时
+  // 「报告_最终版.doc”、“报告_真的最终版.doc」这种带下划线的中文文件名会被误判成
+  // 斜体（前后两个 _ 配对），中间的文字被吞进 <em> 里 —— 症状是正文中一段文字
+  // 莫名变成斜体且跟着 --ink-soft 变蓝灰。这里把汉字/假名/谚文一并算作「词内字符」，
+  // 只认真正落在词边界上的 _（与 CommonMark 的「_ 不做词内强调」一致）。
+  // 注意：改了这条之后，中文句子里夹着写的 `_强调_` 不再生效，改用 *强调*。
+  const WORDY = '\\w\\u3400-\\u4dbf\\u4e00-\\u9fff\\uf900-\\ufaff\\u3040-\\u30ff\\uac00-\\ud7af';
+  s = s.replace(new RegExp(`(?<![_${WORDY}])_([^_\\n]+)_(?![_${WORDY}])`, 'g'), '<em>$1</em>');
 
   s = s.replace(/\u0000(\d+)\u0000/g, (_m, n) => tokens[Number(n)]);
   return s;
