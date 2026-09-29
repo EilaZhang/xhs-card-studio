@@ -185,10 +185,10 @@ footer: 我的账号名       # 底部信息条左侧文字。写完还不会显
    这是刻意设计，不用当成 bug 去「修好」它。
 2. **拿到配置后** —— 写入 `assets/themes/<目标皮肤>.css`（覆盖对应变量即可），或者另存一份 `assets/themes/<新名字>.css`，之后用 `--theme <新名字>` 调用。
    **新皮肤记得在文件头部写好 `@theme-meta`**（名字/别名/摘要/适用场景）—— 别名表和总览页都从这里读，写了才认得出。
-3. **用户手里有配色卡图片** —— 直接跑 `scripts/palette-from-image.mjs`（见下）。它会把图变成候选清单、**自动派到 12 个槽位**、
-   算完对比度自检、落一份草稿皮肤到 `assets/themes/_draft/`。别靠肉眼估色值，也别手工拼那 12 行。
+3. **用户手里有配色卡图片** —— 直接跑 `scripts/palette-from-image.mjs`（见下）。它会把图变成候选清单、**自动派到 9 个槽位**、
+   算完对比度自检、落一份草稿皮肤到 `assets/themes/_draft/`。别靠肉眼估色值，也别手工拼那 9 行。
    角色猜错了再手工指认（`--bg` / `--accent`），这是正常用法不是补救。
-4. **高级用户** —— 直接改 `assets/themes/<皮肤>.css`（只有 12 行配色，每行都有中文注释）。
+4. **高级用户** —— 直接改 `assets/themes/<皮肤>.css`（只有 9 行配色，每行都有中文注释）。
    `assets/base.css` 是「结构 + 所有皮肤共用的基准值」，改字号/间距/字体也是改那里，一般不用动结构部分。
 5. **想换风格但拿不准** —— 先打开 `docs/gallery.html` 看 4 套皮肤 × 3 种边框的实际效果，再决定往哪个方向调。
 
@@ -222,7 +222,7 @@ node scripts/build-preview.mjs   # docs/preview/*.png（跑完会反查 README �
 
 ### 从配色卡图片起一套皮肤（palette-from-image.mjs）
 
-用户发来配色卡/色卡图片、说「照这个配色做一套皮肤」时，**别靠肉眼估色值，也别手工拼 12 个变量**，一条命令：
+用户发来配色卡/色卡图片、说「照这个配色做一套皮肤」时，**别靠肉眼估色值，也别手工拼 9 个变量**，一条命令：
 
 ```bash
 node scripts/palette-from-image.mjs 色卡.png --name 清晨蓝 --write
@@ -232,9 +232,10 @@ node scripts/palette-from-image.mjs 色卡.png --name 清晨蓝 --write
 
 **① 取色**：输出带编号的候选清单（占比 / HSL 明度 / HSL 饱和度 / 与最亮·最暗候选的对比度）。
 
-**② 派色**：把候选色派到 12 个槽位上，每个值都标来源 ——`指定`（命令行给的）/`直取`（卡里现成）/`派生`（按对比度目标算的）/`兜底`。
-只有 3 个槽位是直取（`card-bg` / `ink-strong` / `accent`），其余 9 个由这三个派生，规则写在
+**② 派色**：把候选色派到 9 个槽位上，每个值都标来源 ——`指定`（命令行给的）/`直取`（卡里现成）/`派生`（按对比度目标算的）/`兜底`。
+只有 3 个槽位是直取（`card-bg` / `ink-strong` / `accent`），其余 6 个由这三个派生，规则写在
 `references/theming.md`，是**拿 4 套现成皮肤反推出来的**，不是拍脑袋编的。
+（`accent-soft` / `stage-bg` / `card-shadow` 已下沉到 `assets/base.css`，不再由脚本输出。）
 
 **③ 自检**：按 WCAG 算 4 项硬阈值（`accent`≥3 / `ink`≥7 / `ink-soft`≥4.5 / `mark-ink`≥4.5）
 和 2 项装饰性报数。**不过就写进草稿和报告，不静默。**
@@ -325,11 +326,11 @@ xhs-card-studio/
 │   ├── build-gallery.mjs   生成 docs/gallery.html（视觉模板总览）
 │   ├── build-preview.mjs   生成 docs/preview/*.png（README 门面图）+ 反查 README 引用
 │   ├── build-tuner.mjs     生成 templates/tuner-data.js（调参台的皮肤/边框清单）
-│   ├── palette-from-image.mjs  配色卡图片 -> 候选清单 + 12 槽位 + 对比度自检 -> 草稿皮肤
+│   ├── palette-from-image.mjs  配色卡图片 -> 候选清单 + 9 槽位 + 对比度自检 -> 草稿皮肤
 │   ├── lib/templates.mjs   皮肤/边框清单的唯一读取入口（_draft/ 子目录被天然忽略）
 │   ├── lib/browser.mjs     浏览器探测 + playwright 解析（render / 取色共用）
 │   ├── lib/color.mjs       颜色数学：对比度 / HSL / 混合 / 明度约束 / ΔE
-│   └── lib/palette.mjs     派色：候选色 -> 12 个语义槽位 + 对比度自检（纯函数）
+│   └── lib/palette.mjs     派色：候选色 -> 9 个语义槽位 + 对比度自检（纯函数）
 ├── assets/
 │   ├── base.css            结构骨架 + 所有皮肤共用的基准值（别动结构）
 │   ├── gallery-shell.css   总览页网页自身的配色（不影响出图）

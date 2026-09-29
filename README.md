@@ -168,7 +168,7 @@ frame: paper            # 这份稿子固定用相纸框
 顶部「从哪套皮肤起调」列的就是 `assets/themes/` 下真实存在的皮肤，点一下整套套用；
 下面逐项拖滑杆选颜色，右边 4 张真实卡片实时变，调完点「复制配置」把结果贴给 agent，或点「下载 theme.css」。
 
-**或直接改皮肤文件**：`assets/themes/<皮肤>.css` 里只有 12 行配色，每行都有中文注释。
+**或直接改皮肤文件**：`assets/themes/<皮肤>.css` 里只有 9 行配色，每行都有中文注释。
 字号、间距、字体等共用值在 `assets/base.css`（基准值层），皮肤文件里写同名变量即可覆盖。
 全部可调项见 [`references/theming.md`](references/theming.md)。
 

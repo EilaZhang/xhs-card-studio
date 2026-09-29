@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * [INPUT]: 一张配色卡图片（PNG/JPG/WebP/GIF/BMP，纯色块最好）
- * [OUTPUT]: 候选色清单 + 角色分配 + 12 个槽位 + 对比度自检；--write 时另落 assets/themes/_draft/<slug>.css
+ * [OUTPUT]: 候选色清单 + 角色分配 + 9 个槽位 + 对比度自检；--write 时另落 assets/themes/_draft/<slug>.css
  * [POS]: 取色层 + 映射层的命令行外壳。算法在 lib/（color.mjs 管颜色数学，palette.mjs 管派色），
  *        本文件只管参数、打印、落盘。
  * [PROTOCOL]: 变更时更新此头部
@@ -53,7 +53,9 @@
  *   3. k-means：**farthest-first 确定性播种**（不掷骰子），40 轮 Lloyd
  *   4. 按 CIE76 ΔE 合并相似簇 → 丢碎色 → 按占比排序
  *   派色（阶段二）
- *   5. lib/palette.mjs 把候选色派到 12 个槽位：3 个直取、9 个派生、需要时补 mark-ink
+ *   5. lib/palette.mjs 把候选色派到 9 个槽位：3 个直取、6 个派生、深色底再补一个 mark-ink
+ *      （accent-soft / stage-bg / card-shadow 已下沉到 assets/base.css，
+ *       不再由这里输出 —— 它们要么是算出来的，要么只在预览里可见）
  *   k 默认给 12 是**故意给大**的：多出来的簇会被第 4 步按 ΔE 合并回去，
  *   所以「k 偏大」的代价只是慢一点；k 偏小则会把两种颜色焊死、且无法挽回。
  *   若一个簇都没合并（说明 k 被用满），结尾会提示加大 k。

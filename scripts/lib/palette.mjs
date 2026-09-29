@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
  * [INPUT]: 候选色清单 [{hex, share}] + 可选的角色指认（bg / ink / accent / mark / quote）
- * [OUTPUT]: 12 个槽位的值 + 每个值的来源 + 对比度自检 + 可直接落盘的皮肤 CSS
+ * [OUTPUT]: 9 个槽位的值（+ 条件槽位 mark-ink）+ 每个值的来源 + 对比度自检 + 可直接落盘的皮肤 CSS
  *           来源：指定 / 直取 / 直取·须加深 / 直取·未达标 / 直取·提亮 / 派生 / 兜底 / 省略
  * [POS]: 配色映射层。palette-from-image.mjs（命令行）与 templates/theme-tuner.html（调参台）共用。
  *        **这一层不取色**，输入永远是一份候选清单；纯函数，不碰文件系统。
  * [PROTOCOL]: 变更时更新此头部
  *
  * ── 核心判断：取色简单，派色难 ────────────────────────────
- * 一张配色卡顶多给 3~5 个主色，一套皮肤要 12 个槽位。真正的活是**把颜色派到语义槽位上**。
- * 直取只有 3 个（card-bg / ink-strong / accent），其余 9 个是派生 —— 而且派生规则不是
+ * 一张配色卡顶多给 3~5 个主色，一套皮肤要 9 个槽位。真正的活是**把颜色派到语义槽位上**。
+ * 直取只有 3 个（card-bg / ink-strong / accent），其余 6 个是派生 —— 而且派生规则不是
  * 拍脑袋编的，是拿现有 4 套皮肤（奶油蓝 / 知识风 / 苔绿 / 暗夜）反推出来的：
  *
  *   槽位          派生规则                                4 套皮肤实测
@@ -18,12 +18,21 @@
  *   ink-soft      ink 往 bg 混到对比 ≈4.7:1               实测 4.6~6.1:1（奶油蓝 2.62 是例外）
  *   ink-faint     ink 往 bg 混到对比 ≈2.4:1（装饰性）      实测 1.5~3.5:1
  *   divider       同上，目标 ≈1.5:1                        实测 1.21~1.78:1
- *   accent-soft   浅色＝accent 往白混 86%                  ΔE ≤6
- *                 深色＝accent 往 bg 混 82%               暗夜 ΔE 2
  *   mark-bg       能直取就直取（卡里最艳的那块），否则 accent 提亮   高亮块在 4/4 套里都是最艳、且不暗于强调色
  *   quote-bg      默认 bg 与 ink 混 5%（几乎是底色）       知识风/苔绿/暗夜 ΔE ≤3.5
- *   stage-bg      预览页背景，不在图里，粗略给一个         低风险槽位，不卡精度
- *   card-shadow   浅色＝rgba(ink-strong,.10)，深色＝纯黑   苔绿实测逐位相同
+ *   mark-ink      **条件槽位**：只在字压不住高亮块时才输出（深色皮肤必踩）
+ *
+ * ── 2026-09-30：三个槽位不再由这里输出 ────────────────────
+ * `accent-soft` / `stage-bg` / `card-shadow` 从 12 个槽位里摘掉了：
+ *
+ *   · accent-soft 全仓库只有一处消费（正文链接下划线），用「强调色的半透明版」
+ *     就能表达，已下沉为 assets/base.css 里的默认算法。
+ *   · stage-bg / card-shadow **只在多卡预览里可见** —— base.css 的 body.is-single
+ *     会把页面背景换成 --card-bg、把投影关掉，导出 PNG 时这两个值一定被覆盖。
+ *     它们不是皮肤的「身份色」，浅色方案已在 base.css 给了默认值。
+ *
+ * 所以皮肤文件从 12 行降到 9 行（深色底另加 --mark-ink 和两个预览色覆盖）。
+ * 精简判据与全量对照表见工作区里的 xhs-card-palette-slim.html。
  *
  * 「目标对比度」用二分找混比实现（soften 系列），不是写死一个混合比例 ——
  * 同一个比例在深底和浅底上得到的对比度差得远，按**对比度**定才是稳定的。
@@ -55,7 +64,6 @@ import {
   shade,
   tint,
   toHex,
-  withSaturation,
 } from './color.mjs';
 
 /* ------------------------------------------------------------------ *
@@ -64,18 +72,15 @@ import {
 
 export const SLOTS = [
   { key: 'card-bg', group: '底色', comment: '卡片底色' },
-  { key: 'stage-bg', group: '底色', comment: '预览时的页面背景，不会出现在图里' },
   { key: 'ink-strong', group: '文字', comment: '最重的字：标题' },
   { key: 'ink', group: '文字', comment: '正文颜色' },
   { key: 'ink-soft', group: '文字', comment: '次要文字、封面副标题' },
   { key: 'ink-faint', group: '文字', comment: '最浅的字：图片说明（装饰性，不卡对比度）' },
   { key: 'accent', group: '强调', comment: '序号、小标签、列表圆点、引用竖条' },
-  { key: 'accent-soft', group: '强调', comment: '强调色的浅版本' },
   { key: 'mark-bg', group: '块底色', comment: '==高亮== 的底色' },
   { key: 'mark-ink', group: '块底色', comment: '高亮块里的字色（深色皮肤必须显式给）', optional: true },
   { key: 'quote-bg', group: '块底色', comment: '引用 / 图片块的底色' },
   { key: 'divider', group: '分隔线', comment: '分隔线；同时决定 hairline 配图边框' },
-  { key: 'card-shadow', group: '预览', comment: '预览时的卡片投影，图里看不到' },
 ];
 
 /** 对比度自检项。min 为 0 表示「装饰性，仅报数不带结论」 */
@@ -97,8 +102,6 @@ const T = {
   accentMin: 3, // accent vs bg
   markInkMin: 4.5, // mark-ink vs mark-bg
   darkLum: 0.35, // bg 相对亮度低于此值 = 深色皮肤
-  accentSoftLight: 0.86, // accent-soft：浅色往白混
-  accentSoftDark: 0.82, // accent-soft：深色往 bg 混
   markTintLight: 0.62, // mark-bg 兜底：accent 往白混
   markTintDark: 0.14, // mark-bg 兜底：accent 往白混（深色皮肤的高亮块是亮的）
   quoteMix: 0.05, // quote-bg 兜底：bg 与 ink 混
@@ -154,11 +157,6 @@ function deepenUntil(fg, bgHex, target) {
 
 const satOf = (hex) => rgbToHsl(hex).s;
 const shift = (hex, d) => toHex({ r: parseColor(hex).r + d, g: parseColor(hex).g + d, b: parseColor(hex).b + d });
-
-function rgba(hex, alpha) {
-  const { r, g, b } = parseColor(hex);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 /* ------------------------------------------------------------------ *
  * 映射
@@ -402,19 +400,16 @@ export function mapPalette(colors, opts = {}) {
   })();
   const values = {
     'card-bg': bg,
-    'stage-bg': toHex(light ? shade(withSaturation(bg, satOf(bg) * 0.4), 0.045) : shade(bg, 0.28)),
     'ink-strong': inkStrong,
     ink,
     'ink-soft': soften(ink, bg, bg, T.soft),
     'ink-faint': soften(ink, bg, bg, T.faint),
     accent,
-    'accent-soft': toHex(light ? tint(accent, T.accentSoftLight) : mix(accent, bg, T.accentSoftDark)),
     'mark-bg': mark,
     'quote-bg': quote || toHex(mix(bg, ink, T.quoteMix)),
     divider: soften(ink, bg, bg, T.divider),
-    'card-shadow': light ? `0 18px 48px ${rgba(inkStrong, '0.10')}` : '0 18px 48px rgba(0, 0, 0, 0.45)',
   };
-  for (const k of ['stage-bg', 'ink', 'ink-soft', 'ink-faint', 'accent-soft', 'divider', 'card-shadow']) {
+  for (const k of ['ink', 'ink-soft', 'ink-faint', 'divider']) {
     src[k] = src[k] || '派生';
   }
 
@@ -496,7 +491,7 @@ export function slotMap(slots) {
  * ------------------------------------------------------------------ */
 
 const PAD_KEY = 16; // '--ink-strong:' 是 13 字符
-const PAD_VAL = 36; // card-shadow 的值有 34 字符，是全场最长的
+const PAD_VAL = 12; // 值最长是 mark-ink 的 7 位 hex（'#1b1e24;' 8 字符），留点呼吸
 
 /**
  * 生成一份**可以直接当皮肤用**的 css。
@@ -560,7 +555,7 @@ export function renderThemeCss({ meta, map, sourceLabel, date }) {
   head.push('');
 
   const body = [':root {'];
-  body.push('  /* ---------- 配色：12 个槽位 ---------- */');
+  body.push('  /* ---------- 配色：9 个槽位（深色底会多一行 --mark-ink） ---------- */');
   let group = null;
   for (const s of slots) {
     if (s.group !== group) {

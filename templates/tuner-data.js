@@ -22,17 +22,14 @@ window.__XHS_TPL__ = {
       "order": 1,
       "decls": {
         "--card-bg": "#fcf9e6",
-        "--stage-bg": "#eef3f7",
         "--ink-strong": "#212121",
         "--ink": "#212121",
         "--ink-soft": "#7d9fbf",
         "--ink-faint": "#bcd0e2",
         "--accent": "#6b9bc7",
-        "--accent-soft": "#e5f0f6",
         "--mark-bg": "#c6dcf2",
         "--quote-bg": "#c6dcf2",
-        "--divider": "#a5c0db",
-        "--card-shadow": "0 18px 48px rgba(23, 32, 45, 0.10)"
+        "--divider": "#a5c0db"
       }
     },
     {
@@ -50,17 +47,14 @@ window.__XHS_TPL__ = {
       "order": 2,
       "decls": {
         "--card-bg": "#ffffff",
-        "--stage-bg": "#eceff2",
         "--ink-strong": "#16181d",
         "--ink": "#2f343c",
         "--ink-soft": "#5c646f",
         "--ink-faint": "#9aa3ad",
         "--accent": "#d9483b",
-        "--accent-soft": "#fbe9e6",
         "--mark-bg": "#ffe9a8",
         "--quote-bg": "#f7f8fa",
-        "--divider": "#e6eaee",
-        "--card-shadow": "0 18px 48px rgba(23, 32, 45, 0.10)"
+        "--divider": "#e6eaee"
       }
     },
     {
@@ -80,17 +74,16 @@ window.__XHS_TPL__ = {
       "order": 3,
       "decls": {
         "--card-bg": "#1b1e24",
-        "--stage-bg": "#0f1115",
         "--ink-strong": "#f5f6f8",
         "--ink": "#d5dae2",
         "--ink-soft": "#98a3b3",
         "--ink-faint": "#6a7484",
         "--accent": "#e9b552",
-        "--accent-soft": "#3d3524",
         "--mark-bg": "#f2c94c",
         "--mark-ink": "#1b1e24",
         "--quote-bg": "#24282f",
         "--divider": "#333a44",
+        "--stage-bg": "#0f1115",
         "--card-shadow": "0 18px 48px rgba(0, 0, 0, 0.45)"
       }
     },
@@ -109,17 +102,14 @@ window.__XHS_TPL__ = {
       "order": 4,
       "decls": {
         "--card-bg": "#f2f5ee",
-        "--stage-bg": "#e4e9dd",
         "--ink-strong": "#1f2a22",
         "--ink": "#2b3830",
         "--ink-soft": "#5f7064",
         "--ink-faint": "#a3b0a6",
         "--accent": "#4a7c59",
-        "--accent-soft": "#dce8dc",
         "--mark-bg": "#cfe3b8",
         "--quote-bg": "#e7eee1",
-        "--divider": "#c3cfc2",
-        "--card-shadow": "0 18px 48px rgba(31, 42, 34, 0.10)"
+        "--divider": "#c3cfc2"
       }
     }
   ],
@@ -174,7 +164,6 @@ window.__XHS_TPL__ = {
   ],
   "themeVarKeys": [
     "--accent",
-    "--accent-soft",
     "--card-bg",
     "--card-shadow",
     "--divider",
