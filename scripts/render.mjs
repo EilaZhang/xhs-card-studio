@@ -4,6 +4,7 @@
  * [OUTPUT]: 3:4 卡片 PNG（默认 1080x1440），stdout 输出结构化 JSON 结果
  * [POS]: 渲染层。只做 HTML -> PNG，不管分页与排版
  * [PROTOCOL]: 变更时更新此头部
+ * 依赖: scripts/lib/browser.mjs（浏览器探测与 playwright 解析，与取色脚本共用）
  *
  * 用法:
  *   node scripts/render.mjs <cards.html> [选项]
@@ -21,147 +22,17 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_ROOT = path.resolve(__dirname, '..');
+import { pathToFileURL } from 'node:url';
+import { findBrowser, loadPlaywright } from './lib/browser.mjs';
 
 /* ------------------------------------------------------------------ *
- * 1. 浏览器探测
+ * 1-2. 浏览器探测 与 playwright-core 解析
+ *   已抽到 scripts/lib/browser.mjs（2026-09-29）。原因：本文件末尾**无条件**
+ *   调用 main()，import 它会立刻开始出图 —— 取色脚本没法复用这里的函数。
+ *   现在「出图」与「取色」共用同一份探测逻辑，别再抄回来。
  * ------------------------------------------------------------------ */
-
-function scoreChromiumDir(name) {
-  // 优先完整版 chromium-*（element 截图最稳），headless_shell 次之
-  const m = name.match(/^chromium(?:_headless_shell)?-(\d+)$/);
-  if (!m) return null;
-  const isShell = name.startsWith('chromium_headless_shell');
-  return { version: parseInt(m[1], 10), isShell };
-}
-
-function candidateRels() {
-  const rel = [];
-  if (process.platform === 'win32') {
-    rel.push('chrome-win64/chrome.exe', 'chrome-win/chrome.exe');
-  } else if (process.platform === 'darwin') {
-    rel.push(
-      'chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-      'chrome-mac-arm64/Chromium.app/Contents/MacOS/Chromium'
-    );
-  } else {
-    rel.push('chrome-linux/chrome', 'chrome-linux64/chrome');
-  }
-  return rel;
-}
-
-function scanPlaywrightCache(root) {
-  const found = [];
-  if (!root || !fs.existsSync(root)) return found;
-  let entries = [];
-  try {
-    entries = fs.readdirSync(root);
-  } catch {
-    return found;
-  }
-  for (const dir of entries) {
-    const meta = scoreChromiumDir(dir);
-    if (!meta) continue;
-    for (const rel of candidateRels()) {
-      const exe = path.join(root, dir, rel);
-      if (fs.existsSync(exe)) {
-        // 完整版加成，版本号越高越优先
-        found.push({ exe, rank: meta.version * 10 + (meta.isShell ? 0 : 5) });
-      }
-    }
-  }
-  return found.sort((a, b) => b.rank - a.rank);
-}
-
-function systemBrowsers() {
-  const list = [];
-  if (process.platform === 'win32') {
-    const pf = process.env['ProgramFiles'] || 'C:\\Program Files';
-    const pf86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
-    const local = process.env['LOCALAPPDATA'] || '';
-    list.push(
-      path.join(pf, 'Google/Chrome/Application/chrome.exe'),
-      path.join(pf86, 'Google/Chrome/Application/chrome.exe'),
-      local && path.join(local, 'Google/Chrome/Application/chrome.exe'),
-      path.join(pf, 'Microsoft/Edge/Application/msedge.exe'),
-      path.join(pf86, 'Microsoft/Edge/Application/msedge.exe')
-    );
-  } else if (process.platform === 'darwin') {
-    list.push(
-      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-      '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
-      '/Applications/Chromium.app/Contents/MacOS/Chromium'
-    );
-  } else {
-    for (const bin of ['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', 'microsoft-edge']) {
-      const r = spawnSync('which', [bin], { encoding: 'utf8' });
-      if (r.status === 0 && r.stdout.trim()) list.push(r.stdout.trim());
-    }
-  }
-  return list.filter((p) => p && fs.existsSync(p));
-}
-
-function findBrowser(explicit) {
-  if (explicit) {
-    if (!fs.existsSync(explicit)) throw new Error(`指定的浏览器不存在: ${explicit}`);
-    return explicit;
-  }
-  if (process.env.XHS_CHROME_EXECUTABLE) {
-    return process.env.XHS_CHROME_EXECUTABLE;
-  }
-  const roots = [
-    process.env.PLAYWRIGHT_BROWSERS_PATH,
-    process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'ms-playwright'),
-    path.join(os.homedir(), '.cache', 'ms-playwright'),
-    path.join(os.homedir(), 'Library', 'Caches', 'ms-playwright'),
-  ].filter(Boolean);
-
-  for (const root of roots) {
-    const hit = scanPlaywrightCache(root);
-    if (hit.length) return hit[0].exe;
-  }
-  const sys = systemBrowsers();
-  if (sys.length) return sys[0];
-  throw new Error(
-    '找不到可用的浏览器。请安装 Chrome，或运行 npx playwright install chromium，' +
-      '也可以用 --chrome 指定浏览器路径。'
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * 2. playwright-core 加载（不污染用户环境，从托管目录解析）
- * ------------------------------------------------------------------ */
-
-function loadPlaywright() {
-  const bases = [];
-  if (process.env.NODE_PATH) bases.push(...process.env.NODE_PATH.split(path.delimiter));
-  bases.push(
-    path.join(SKILL_ROOT, 'node_modules'),
-    path.join(os.homedir(), '.workbuddy', 'binaries', 'node', 'workspace', 'node_modules'),
-    path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules')
-  );
-  for (const base of bases) {
-    if (!base || !fs.existsSync(base)) continue;
-    try {
-      const req = createRequire(path.join(base, '_resolver.js'));
-      return req('playwright-core');
-    } catch {
-      /* 继续试下一个 */
-    }
-  }
-  try {
-    return createRequire(import.meta.url)('playwright-core');
-  } catch {
-    return null;
-  }
-}
 
 /* ------------------------------------------------------------------ *
  * 3. 两种引擎

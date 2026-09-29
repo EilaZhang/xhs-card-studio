@@ -3,6 +3,11 @@
 outputs/*
 !outputs/.gitkeep
 
+# ---- 皮肤草稿 ----
+# palette-from-image.mjs --write 的落点。草稿是「看过再决定」的中间产物，
+# 而且模板清单本来就忽略子目录；别让它被顺手提交进仓库。
+assets/themes/_draft/
+
 # ---- 临时调试脚本 ----
 outputs/_*.mjs
 *.tmp
