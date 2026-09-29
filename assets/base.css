@@ -193,8 +193,13 @@ body.is-single .card {
 /* ==高亮== 语法
    底色 = --mark-bg，字色 = --mark-ink（未设时跟随 --ink-strong，行为同以前）。
    浅色底：亮底色 + 深字；深色底：亮底色 + **深字**（不能用近白的 --ink-strong，
-   白字压亮黄只有 1.4:1，等于看不见）。深色皮肤务必显式设 --mark-ink。 */
-.card__content mark {
+   白字压亮黄只有 1.4:1，等于看不见）。深色皮肤务必显式设 --mark-ink。
+
+   ⚠️ 选择器必须是 .card mark，不能写 .card__content mark：
+   `## 标题里写 ==高亮==` 时 mark 落在 .card__title 内，不在 .card__content 内，
+   只管后者会漏掉标题，浏览器 UA 默认的黄色（mark 的默认底色就是黄）就会漏出来，
+   同一份稿件里出现「正文淡蓝 + 标题刺眼黄」的割裂感。 */
+.card mark {
   background: var(--mark-bg);
   color: var(--mark-ink, var(--ink-strong));
   padding: 0 0.16em;
