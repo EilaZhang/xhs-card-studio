@@ -59,4 +59,13 @@
 
   /* 分隔线：同时决定 hairline 配图边框的颜色 */
   --divider: #a5c0db;
+
+  /* ---------- 字号覆盖（按用户要求调小） ----------
+     2026-10-10：用户要求「正文字号调小、引用块字号也调小」。
+     基准值在 assets/base.css：--body-size 40px / --quote-size 52px，
+     本处下调为 36px / 44px，并同步把行距从 1.78 收到 1.72。
+     想复原直接删掉这三行即可。 */
+  --body-size: 36px;
+  --body-leading: 1.72;
+  --quote-size: 44px;
 }

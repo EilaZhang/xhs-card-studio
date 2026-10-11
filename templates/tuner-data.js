@@ -29,7 +29,10 @@ window.__XHS_TPL__ = {
         "--accent": "#6b9bc7",
         "--mark-bg": "#c6dcf2",
         "--quote-bg": "#c6dcf2",
-        "--divider": "#a5c0db"
+        "--divider": "#a5c0db",
+        "--body-size": "36px",
+        "--body-leading": "1.72",
+        "--quote-size": "44px"
       }
     },
     {
@@ -111,6 +114,36 @@ window.__XHS_TPL__ = {
         "--quote-bg": "#e7eee1",
         "--divider": "#c3cfc2"
       }
+    },
+    {
+      "key": "暮紫",
+      "name": "暮紫",
+      "badges": "深色底",
+      "slug": "dusk",
+      "aliases": [
+        "暮紫",
+        "紫霞",
+        "紫夜",
+        "dusk",
+        "purple",
+        "violet"
+      ],
+      "summary": "深靛蓝底 + 奶油白字 + 粉强调，冷底暖字的对照",
+      "order": 5,
+      "decls": {
+        "--card-bg": "#4e506c",
+        "--ink-strong": "#fff0e3",
+        "--ink": "#fff0e3",
+        "--ink-soft": "#d1c7c4",
+        "--ink-faint": "#918d99",
+        "--accent": "#f7d0d1",
+        "--mark-bg": "#f8d7d7",
+        "--mark-ink": "#4e506c",
+        "--quote-bg": "#575872",
+        "--divider": "#6c6b80",
+        "--stage-bg": "#2c2e3e",
+        "--card-shadow": "0 18px 48px rgba(0, 0, 0, 0.45)"
+      }
     }
   ],
   "frames": [
@@ -164,6 +197,8 @@ window.__XHS_TPL__ = {
   ],
   "themeVarKeys": [
     "--accent",
+    "--body-leading",
+    "--body-size",
     "--card-bg",
     "--card-shadow",
     "--divider",
@@ -174,8 +209,9 @@ window.__XHS_TPL__ = {
     "--mark-bg",
     "--mark-ink",
     "--quote-bg",
+    "--quote-size",
     "--stage-bg"
   ],
-  "themeCount": 4,
+  "themeCount": 5,
   "frameCount": 3
 };
