@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-CN" data-page-node-id="78o4cD9lQpTTRURMnUr7cE">
+<head data-page-node-id="ahQcGLX9KDVNLAT08udE4a">
+<meta charset="utf-8" data-page-node-id="didjeChbRuxnwqbeD7Drgp">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="6q6K7k2QIZw6APjwnu5cyE">
 <title>xhs-card-studio · 视觉模板总览</title>
-<link rel="stylesheet" href="../assets/base.css">
-<link rel="stylesheet" href="../assets/gallery-shell.css">
+<link rel="stylesheet" href="../assets/base.css" data-page-node-id="gBR75RgLeyod4KvnGnDKzY">
+<link rel="stylesheet" href="../assets/gallery-shell.css" data-page-node-id="P26LNGJU011gz19MFxZjH6">
 <style>
 /* 总览页自己的样式。
    这里**只写排布与缩放，颜色一律走 var(--gal-*)** —— 那些变量的定义在
@@ -54,304 +54,330 @@ body.gal {
 .ratio .ok { color: var(--gal-ok); }
 .ratio .warn { color: var(--gal-warn); }
 
-.tpl__cards { display: flex; flex-wrap: wrap; gap: 14px; }
-.shot { width: 210px; height: 280px; overflow: hidden; border-radius: 8px;
+.tpl__cards { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+/* 样张与实尺示意都不许被 flex 压扁 —— 压了就会把放大后的卡片裁掉，边框又白画了 */
+.shot { flex: 0 0 auto; width: 210px; height: 280px; overflow: hidden; border-radius: 8px;
   border: 1px solid var(--gal-border); background: var(--gal-surface); }
 .shot .scope { width: 1080px; transform: scale(0.1944); transform-origin: top left; }
+/* 边框样张：放大到 50%，否则 8px 的细描边缩完只剩 1.5px（见 shot() 注释） */
+.shot--big { width: 540px; height: 720px; }
+.shot--big .scope { transform: scale(0.5); }
 .scope .deck { flex-direction: row; gap: 0; padding: 0; }
 .shot .card { box-shadow: none; }  /* 出图里本来就没有投影，这里也不显示 */
+
+/* 边框实尺示意（1:1）。外框 = 真实卡片底，内块 = 模拟的一张浅色截图 */
+.fs { flex: 0 0 220px; width: 220px; }
+.fs__stage { background: var(--card-bg); border-radius: 12px; padding: 24px; }
+.fs__box { width: 172px; height: 110px; box-sizing: border-box; border-radius: var(--radius, 24px);
+  background: var(--gal-surface);
+  border: var(--img-border-w) solid var(--img-border-color);
+  box-shadow: var(--img-shadow); }
+.fs__cap { margin: 7px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--gal-ink-faint); }
 </style>
 </head>
-<body class="gal">
-<h1>视觉模板总览</h1>
-<p class="lede">共 <b>5</b> 套皮肤 × <b>3</b> 种配图边框 = <b>15</b> 种组合。下面每张卡片都是真实渲染产物，不是截图素材。</p>
-<p class="note">本页由 <code>node scripts/build-gallery.mjs</code> 生成，样式改完重跑一遍即可。样张稿件：<code>examples/demo-gallery.md</code></p>
+<body class="gal" data-page-node-id="SFAuPWCGfWDOpHkrE7XqcZ">
+<h1 data-page-node-id="maVye6RAPxdC1VKaS2RVdx">视觉模板总览</h1>
+<p class="lede" data-page-node-id="3TL1YyTpXZC4LlMFwXcQj9">共 <b data-page-node-id="ysABkEmisah6k0CI6sKTCH">5</b> 套皮肤 × <b data-page-node-id="6yvAVD6QHD2qq5BC4B1AVf">3</b> 种配图边框 = <b data-page-node-id="I0bjXv6eCuFltneFdbMWsV">15</b> 种组合。下面每张卡片都是真实渲染产物，不是截图素材。</p>
+<p class="note" data-page-node-id="9aQa7AJzUY2HY34kTWlawe">本页由 <code data-page-node-id="Acwv1Ji3NjCKe2v9RDjUf4">node scripts/build-gallery.mjs</code> 生成，样式改完重跑一遍即可。样张稿件：<code data-page-node-id="EAZ61ryTvHJnEi69cednsv">examples/demo-gallery.md</code></p>
 
 
 
-<h2>皮肤</h2>
-<p class="hint">同一份样张、同一种边框（默认细描边），只换皮肤。右侧是该皮肤自己的分页结果。</p>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>奶油蓝<span class="badge">默认</span></h3>
-    <p class="tpl__file">assets/themes/default.css</p>
-    <p class="tpl__desc">奶油黄底 + 淡蓝点缀，整体清淡克制</p>
-    <p class="tpl__use"><b>适合</b>　通用内容 / 知识分享 / 日常记录</p>
-    <div class="sw"><span style="background:#fcf9e6" title="--card-bg: #fcf9e6"></span><span style="background:#212121" title="--ink: #212121"></span><span style="background:#6b9bc7" title="--accent: #6b9bc7"></span><span style="background:#c6dcf2" title="--mark-bg: #c6dcf2"></span></div>
-    <ul class="ratio"><li><span>--accent 序号/标签</span><b class="warn">2.78:1 △</b></li><li><span>--ink-soft 副标题</span><b class="warn">2.62:1 △</b></li><li><span>--ink 正文</span><b class="ok">15.21:1 ✓</b></li></ul>
-    <p class="tpl__cmd"><code>--theme default</code></p>
-    <p class="tpl__alias">别名：default / 默认 / 奶油蓝 / creamblue / cream-blue</p>
+<h2 data-page-node-id="KVumx2TVWehLwMNJ7YnCZZ">皮肤</h2>
+<p class="hint" data-page-node-id="JRWS3Tr01sWqHtKrJ4dUpQ">同一份样张、同一种边框（默认细描边），只换皮肤。右侧是该皮肤自己的分页结果。</p>
+<article class="tpl" data-page-node-id="Kablu7BCLJiBjE8bjA95sA">
+  <div class="tpl__info" data-page-node-id="aJXWtBAEmJhKAUHphNhLTo">
+    <h3 data-page-node-id="lAbwrCb58CbznemklAoB3m">奶油蓝<span class="badge" data-page-node-id="y3VfdHDnDSoly7dpWRD1ev">默认</span></h3>
+    <p class="tpl__file" data-page-node-id="Z19tDLDRwpaKGtwBtGs35J">assets/themes/default.css</p>
+    <p class="tpl__desc" data-page-node-id="S0Q3r6j3yyB1lK0zHDy5wD">奶油黄底 + 淡蓝点缀，整体清淡克制</p>
+    <p class="tpl__use" data-page-node-id="wEtbazbovBum1VbA04DRRW"><b data-page-node-id="tQOCohBYO0CZ70NyHT2fGN">适合</b>　通用内容 / 知识分享 / 日常记录</p>
+    <div class="sw" data-page-node-id="uHr27zhdDsxBpc2w4KEBbe"><span style="background:#fcf9e6" title="--card-bg: #fcf9e6" data-page-node-id="hWrCPHHH3whAY1CRIcsKC7"></span><span style="background:#212121" title="--ink: #212121" data-page-node-id="jA3ffgz1HGT83D7kvEgrRF"></span><span style="background:#6b9bc7" title="--accent: #6b9bc7" data-page-node-id="0z2guYoFwNr2yK07pT4dQq"></span><span style="background:#c6dcf2" title="--mark-bg: #c6dcf2" data-page-node-id="D466ki46ngNDktjs7ucMoJ"></span></div>
+    <ul class="ratio" data-page-node-id="o1Kga6DG54Y5xZURATy8oz"><li data-page-node-id="xeRTaaQIPXQUGJ5StHNybo"><span data-page-node-id="4iAfUBKNm9Cnt5zFJj0zLY">--accent 序号/标签</span><b class="warn" data-page-node-id="td6zvv6eKO7K4RSCxVWsTO">2.78:1 △</b></li><li data-page-node-id="nkg14IwdDtctJNcrYFQaQu"><span data-page-node-id="0Pgp491HyfXOTdVBC7Eimu">--ink-soft 副标题</span><b class="warn" data-page-node-id="emJDnOjEsaL1dipKqN2SPs">2.62:1 △</b></li><li data-page-node-id="VjphMPg7GxdmKmTiMXKwzF"><span data-page-node-id="KO7GKJo77eHnh1IpomV7E1">--ink 正文</span><b class="ok" data-page-node-id="Fjzpk4oybA5LJwbEQBCuoL">15.21:1 ✓</b></li></ul>
+    <p class="tpl__cmd" data-page-node-id="zApRalOitsGA3s9DRKMLk2"><code data-page-node-id="qMhU7Vb3TcihxQjlpkr1xT">--theme default</code></p>
+    <p class="tpl__alias" data-page-node-id="DjxY0WF9aVHi9VemqL3D48">别名：default / 默认 / 奶油蓝 / creamblue / cream-blue</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--cover">
-  <div class="card__head"><span class="card__kicker">样式参考</span><h1 class="card__title">一套样张，看遍所有皮肤</h1></div>
-  <div class="card__body">
-    <div class="card__content">
-<blockquote><p>下面三页在所有皮肤/边框下<strong>共用同一份内容</strong>，只有样式在变</p></blockquote>
+  <div class="tpl__cards" data-page-node-id="bnw2k4uWyHtzz4aWX5W1Ai"><div class="shot" data-page-node-id="wPsXZW15oGlxXIJkfTjTE7"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="hfXu8bSDuDD9HN3PXFXVsf"><div class="deck" data-page-node-id="6KJqGQNwR1ba2Bd8v0g2yq"><section class="card card--cover" data-page-node-id="Rwch2LDhC4mPEgzn1OGNIo">
+  <div class="card__head" data-page-node-id="10Mh0z9ahsvIKwDxHPB7mI"><span class="card__kicker" data-page-node-id="ni09ZyhUJ8oC3q3BknUpI0">样式参考</span><h1 class="card__title" data-page-node-id="NbWBxt62s0FYBdDeMF8A6g">一套样张，看遍所有皮肤</h1></div>
+  <div class="card__body" data-page-node-id="18JQVROmCmEkFCsMI5236Y">
+    <div class="card__content" data-page-node-id="Ees8GF1LnbHRygp7aVZuVA">
+<blockquote data-page-node-id="pFxW4KnwRYAYAngqjDZdzL"><p data-page-node-id="2w2sgMQR6B7BInksUu7LLd">下面三页在所有皮肤/边框下<strong data-page-node-id="9rrAF3hREFopVBOHAAnAqk">共用同一份内容</strong>，只有样式在变</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">一份内容，多种皮肤</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<p>换皮肤只要加一个 <code>--theme</code> 参数，稿子一个字都不用改。</p>
-<ol><li>皮肤管配色，改 <code>assets/themes/*.css</code></li><li>边框管配图，改 <code>--frame</code> 参数</li><li>想自己调色，打开 <code>templates/theme-tuner.html</code></li></ol>
-<p><mark>皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
-<blockquote><p>样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
+</section></div></div></div><div class="shot" data-page-node-id="v2thJN7GVuxAnftWVk7dV2"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="1QCrR8qlP93yh0PAvokR4z"><div class="deck" data-page-node-id="6mkVzegZVcm9BZgADhgUIN"><section class="card card--content card--airy" data-page-node-id="1dUY0D6TRwusCOSBN1yHdf">
+  <div class="card__head" data-page-node-id="p0QuEDlYiFvxD0ckkbOWmG"><h2 class="card__title" data-page-node-id="ANhGKyg2O3qkYHBth0K6lS">一份内容，多种皮肤</h2></div>
+  <div class="card__body" data-page-node-id="aYHU5qtg6imlKkqTyJiXQh">
+    <div class="card__content" data-page-node-id="NgmzOyEhVOCQrvMQxBzfaw">
+<p data-page-node-id="WndQPydxEOESO52dLczc4G">换皮肤只要加一个 <code data-page-node-id="0TRz4enluQWdL2mb13oVZk">--theme</code> 参数，稿子一个字都不用改。</p>
+<ol data-page-node-id="DwSBwRnPhszXMptsA0DpFy"><li data-page-node-id="AWAQCf1p3Qo8PK6cylIQqG">皮肤管配色，改 <code data-page-node-id="Wdi3IzefyaTI6GwHVxDXK1">assets/themes/*.css</code></li><li data-page-node-id="t023aIa2C2Ezj2KLiLC0ZQ">边框管配图，改 <code data-page-node-id="KPnYM0vgeUPJ3mKeEYnXva">--frame</code> 参数</li><li data-page-node-id="4ZnuLBkmLOaHwDFt4XpMJg">想自己调色，打开 <code data-page-node-id="umvDoRL7oJIVPRFGLXeS5E">templates/theme-tuner.html</code></li></ol>
+<p data-page-node-id="HVbK6oUskdYFh2jEPxIsW1"><mark data-page-node-id="S7WxwAlrcinuRvkPBpaL1n">皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
+<blockquote data-page-node-id="xNi0h0EE7PM9EtCuxvdrTn"><p data-page-node-id="xcSY0xyAbTB3HRNLdrxNw5">样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
-    </div>
-  </div>
-  
-</section></div></div></div></div>
-</article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>暗夜<span class="badge">深色底</span></h3>
-    <p class="tpl__file">assets/themes/暗夜.css</p>
-    <p class="tpl__desc">深炭蓝底 + 琥珀强调，在白底信息流里辨识度最高</p>
-    <p class="tpl__use"><b>适合</b>　观点输出 / 深夜向内容 / 想要「沉下去」的视觉</p>
-    <div class="sw"><span style="background:#1b1e24" title="--card-bg: #1b1e24"></span><span style="background:#d5dae2" title="--ink: #d5dae2"></span><span style="background:#e9b552" title="--accent: #e9b552"></span><span style="background:#f2c94c" title="--mark-bg: #f2c94c"></span></div>
-    <ul class="ratio"><li><span>--accent 序号/标签</span><b class="ok">8.90:1 ✓</b></li><li><span>--ink-soft 副标题</span><b class="ok">6.54:1 ✓</b></li><li><span>--ink 正文</span><b class="ok">11.89:1 ✓</b></li></ul>
-    <p class="tpl__cmd"><code>--theme 暗夜</code></p>
-    <p class="tpl__alias">别名：暗夜 / 夜色 / 深色 / 暗色 / dark / night</p>
-  </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--cover">
-  <div class="card__head"><span class="card__kicker">样式参考</span><h1 class="card__title">一套样张，看遍所有皮肤</h1></div>
-  <div class="card__body">
-    <div class="card__content">
-<blockquote><p>下面三页在所有皮肤/边框下<strong>共用同一份内容</strong>，只有样式在变</p></blockquote>
-    </div>
-  </div>
-  
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">一份内容，多种皮肤</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<p>换皮肤只要加一个 <code>--theme</code> 参数，稿子一个字都不用改。</p>
-<ol><li>皮肤管配色，改 <code>assets/themes/*.css</code></li><li>边框管配图，改 <code>--frame</code> 参数</li><li>想自己调色，打开 <code>templates/theme-tuner.html</code></li></ol>
-<p><mark>皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
-<blockquote><p>样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
-    </div>
-  </div>
-  
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+</section></div></div></div><div class="shot" data-page-node-id="JrXJ47fOjMjOCoYLxdPgFe"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="C8QZ8aisBVCAuC4Lg06IlJ"><div class="deck" data-page-node-id="SAj3JzCWmGGyWBlHznRLDZ"><section class="card card--content" data-page-node-id="PLwDm6cc1lkiqGVBvx3qtO">
+  <div class="card__head" data-page-node-id="63PCIWUYrTc6b1nGdRe2rl"><h2 class="card__title" data-page-node-id="iZlCq63wvIOJlID5AiogdB">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="RGYiOuWnUiHrpBFDEtvFu1">
+    <div class="card__content" data-page-node-id="o7HxdA7P8LZ2Fsfx1BLU0S">
+<figure data-page-node-id="UyVTcGcYYSotAtEcyDglCE"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="dlVgrqvzYARIDrDtsTd0iX"></figure>
+<p data-page-node-id="t1a6d3sKFZzR2xOIhDCr4N"><code data-page-node-id="7jlqwIP97QYjE6VXX3O5IP">--frame</code> 有三个值：<code data-page-node-id="oVqeNAImJOlSpZbesLxblP">hairline</code> 细描边、<code data-page-node-id="IAO8XaLO4k9VX3hffh9eO3">paper</code> 相纸框、<code data-page-node-id="lyBwEB5n9B4Kac82YRygL7">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   
 </section></div></div></div></div>
 </article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>暮紫<span class="badge">深色底</span></h3>
-    <p class="tpl__file">assets/themes/暮紫.css</p>
-    <p class="tpl__desc">深靛蓝底 + 奶油白字 + 粉强调，冷底暖字的对照</p>
-    <p class="tpl__use"><b>适合</b>　情绪 / 观点 / 女性向内容 / 想要柔和一点的个人表达</p>
-    <div class="sw"><span style="background:#4e506c" title="--card-bg: #4e506c"></span><span style="background:#fff0e3" title="--ink: #fff0e3"></span><span style="background:#f7d0d1" title="--accent: #f7d0d1"></span><span style="background:#f8d7d7" title="--mark-bg: #f8d7d7"></span></div>
-    <ul class="ratio"><li><span>--accent 序号/标签</span><b class="ok">5.54:1 ✓</b></li><li><span>--ink-soft 副标题</span><b class="ok">4.72:1 ✓</b></li><li><span>--ink 正文</span><b class="ok">7.00:1 ✓</b></li></ul>
-    <p class="tpl__cmd"><code>--theme 暮紫</code></p>
-    <p class="tpl__alias">别名：暮紫 / 紫霞 / 紫夜 / dusk / purple / violet</p>
+<article class="tpl" data-page-node-id="lG92u9OusX1gnFHmwjjHEO">
+  <div class="tpl__info" data-page-node-id="L6fXO2RlcaaA5HfLj46QrH">
+    <h3 data-page-node-id="Xxv1nDH9FKnBQYKAizHz4D">暗夜<span class="badge" data-page-node-id="wVeSxEU9bxYeljd4pDZ9Tc">深色底</span></h3>
+    <p class="tpl__file" data-page-node-id="xOa0BGF0whCpQL64kaD72S">assets/themes/暗夜.css</p>
+    <p class="tpl__desc" data-page-node-id="jha0MvdmJXSh0l2Pt5gNBS">深炭蓝底 + 琥珀强调，在白底信息流里辨识度最高</p>
+    <p class="tpl__use" data-page-node-id="OXHFOzJa9qGai2EE3QBoKO"><b data-page-node-id="2AQ3uYb2hCgQu43Sj5o76u">适合</b>　观点输出 / 深夜向内容 / 想要「沉下去」的视觉</p>
+    <div class="sw" data-page-node-id="iYJLYji7SEgpfY3xMojleH"><span style="background:#1b1e24" title="--card-bg: #1b1e24" data-page-node-id="MJNgYTEFGp73DIHgp6O2yP"></span><span style="background:#d5dae2" title="--ink: #d5dae2" data-page-node-id="QOONWLDM1dvBtolOWXpbcw"></span><span style="background:#e9b552" title="--accent: #e9b552" data-page-node-id="r1lbVCBi6mg2AoCIgv8SOA"></span><span style="background:#f2c94c" title="--mark-bg: #f2c94c" data-page-node-id="XODCqduttdIjBNiH0WLP2L"></span></div>
+    <ul class="ratio" data-page-node-id="5DEd3HM32xgBPobIDztS2L"><li data-page-node-id="NgIo7ubnmAKKguCiuOjFxj"><span data-page-node-id="EcxEu4lODyf4B9EIi5ZBuD">--accent 序号/标签</span><b class="ok" data-page-node-id="RkXoO47O9FxWYq1dJCDjVD">8.90:1 ✓</b></li><li data-page-node-id="N6L8lP0FmSYiaRQjZkkLbY"><span data-page-node-id="eC0R5KChZpnND4jWHsIHDJ">--ink-soft 副标题</span><b class="ok" data-page-node-id="eHwGOj8zBxDC1vAi7kIBxW">6.54:1 ✓</b></li><li data-page-node-id="DYTPyHTyp4zndhpomEsQ8d"><span data-page-node-id="PHKgypbhst8m7HGPJ4QQ7s">--ink 正文</span><b class="ok" data-page-node-id="JevZZXNVMUinupU55ae74D">11.89:1 ✓</b></li></ul>
+    <p class="tpl__cmd" data-page-node-id="DUaecakkDbEht4SCY8tDox"><code data-page-node-id="VnhV0iB5uLJJ8WYUvetuFr">--theme 暗夜</code></p>
+    <p class="tpl__alias" data-page-node-id="nqGJZ6A3XrWl8thgSD3sIH">别名：暗夜 / 夜色 / 深色 / 暗色 / dark / night</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--cover">
-  <div class="card__head"><span class="card__kicker">样式参考</span><h1 class="card__title">一套样张，看遍所有皮肤</h1></div>
-  <div class="card__body">
-    <div class="card__content">
-<blockquote><p>下面三页在所有皮肤/边框下<strong>共用同一份内容</strong>，只有样式在变</p></blockquote>
+  <div class="tpl__cards" data-page-node-id="3hM1MaNDV7eordBSmhQzPU"><div class="shot" data-page-node-id="neXZkosEK5BJhV6PzvRDWF"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="43m59aYYpvw3rpSh1S4J6E"><div class="deck" data-page-node-id="Q3rXZjdDJi5v7keD3dGw2k"><section class="card card--cover" data-page-node-id="wXuRCednjjAwSgGKCrqbo4">
+  <div class="card__head" data-page-node-id="7syUi4s5JwpG5jVtCEzw2B"><span class="card__kicker" data-page-node-id="u8nvKmZdZSTzOY9u3Er7O1">样式参考</span><h1 class="card__title" data-page-node-id="AV1Y0u6EIF0cwMpCCTr1k1">一套样张，看遍所有皮肤</h1></div>
+  <div class="card__body" data-page-node-id="KzC1nXOOSu52i8e1C4VjTr">
+    <div class="card__content" data-page-node-id="xdvdHY9werH4YyAId8GcW2">
+<blockquote data-page-node-id="YkThGXz6bjh3pFAVz2CFah"><p data-page-node-id="VpLCcnmTOudLStnTSySkTp">下面三页在所有皮肤/边框下<strong data-page-node-id="fUUgFnkRLLTutO7RgW4nm7">共用同一份内容</strong>，只有样式在变</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">一份内容，多种皮肤</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<p>换皮肤只要加一个 <code>--theme</code> 参数，稿子一个字都不用改。</p>
-<ol><li>皮肤管配色，改 <code>assets/themes/*.css</code></li><li>边框管配图，改 <code>--frame</code> 参数</li><li>想自己调色，打开 <code>templates/theme-tuner.html</code></li></ol>
-<p><mark>皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
-<blockquote><p>样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
+</section></div></div></div><div class="shot" data-page-node-id="ztIOs91IvGuKOaRM22cOH2"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="vCRd1KukjFxJ2EOxmN1mbE"><div class="deck" data-page-node-id="d3cszsKcSnUJwOo9zqC2aF"><section class="card card--content card--airy" data-page-node-id="PfwrBe9gx0dbEDZItbzHhg">
+  <div class="card__head" data-page-node-id="5V6yn4KUYogfcq2Ez2LXC1"><h2 class="card__title" data-page-node-id="Fl88vLKmzQMQQ0ZKBGDq6N">一份内容，多种皮肤</h2></div>
+  <div class="card__body" data-page-node-id="ahZabfpCVgZJ0If8pPQGQs">
+    <div class="card__content" data-page-node-id="faI2UZStPfOBDX4H00mbew">
+<p data-page-node-id="iMe5wTcs5WjnihAxspT7Sw">换皮肤只要加一个 <code data-page-node-id="erX5RQqT7XmclDLQefGrax">--theme</code> 参数，稿子一个字都不用改。</p>
+<ol data-page-node-id="kS5l46dQ2J8YZTc22S3Ujp"><li data-page-node-id="dbPRa5wBZwrbjO4dMMgzYa">皮肤管配色，改 <code data-page-node-id="LiMc5sBeellpUEbneRFN49">assets/themes/*.css</code></li><li data-page-node-id="THTpo0pcaGD3BVF1U3hrak">边框管配图，改 <code data-page-node-id="3ZeEuTi6TuAle682IfPjrG">--frame</code> 参数</li><li data-page-node-id="TxEEiOcdzNmjTzP2MEulrF">想自己调色，打开 <code data-page-node-id="7DoC4wCyJNWEzSxIa9ym1M">templates/theme-tuner.html</code></li></ol>
+<p data-page-node-id="sh1ca0rW6WfNaIk7gGUgH4"><mark data-page-node-id="qoOzTWE360qtDj1lNzDdW6">皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
+<blockquote data-page-node-id="hsmxSZqkTL09ONewHVJ2tZ"><p data-page-node-id="5xBHRkbJCUL3NTUFodhwH3">样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
-    </div>
-  </div>
-  
-</section></div></div></div></div>
-</article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>普鲁士蓝<span class="badge">米白底</span></h3>
-    <p class="tpl__file">assets/themes/普鲁士蓝.css</p>
-    <p class="tpl__desc">米白底 + 普鲁士蓝与藏青，低饱和冷调，纸感克制</p>
-    <p class="tpl__use"><b>适合</b>　穿搭 / 生活美学 / 品牌调性 / 复古质感内容</p>
-    <div class="sw"><span style="background:#efefe7" title="--card-bg: #efefe7"></span><span style="background:#35506e" title="--ink: #35506e"></span><span style="background:#617a99" title="--accent: #617a99"></span><span style="background:#b9c4c6" title="--mark-bg: #b9c4c6"></span></div>
-    <ul class="ratio"><li><span>--accent 序号/标签</span><b class="ok">3.82:1 ✓</b></li><li><span>--ink-soft 副标题</span><b class="ok">4.71:1 ✓</b></li><li><span>--ink 正文</span><b class="ok">7.20:1 ✓</b></li></ul>
-    <p class="tpl__cmd"><code>--theme 普鲁士蓝</code></p>
-    <p class="tpl__alias">别名：普鲁士蓝 / 雾霾蓝 / 藏青 / prussian / prussianblue / prussian-blue / navy</p>
-  </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--cover">
-  <div class="card__head"><span class="card__kicker">样式参考</span><h1 class="card__title">一套样张，看遍所有皮肤</h1></div>
-  <div class="card__body">
-    <div class="card__content">
-<blockquote><p>下面三页在所有皮肤/边框下<strong>共用同一份内容</strong>，只有样式在变</p></blockquote>
-    </div>
-  </div>
-  
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">一份内容，多种皮肤</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<p>换皮肤只要加一个 <code>--theme</code> 参数，稿子一个字都不用改。</p>
-<ol><li>皮肤管配色，改 <code>assets/themes/*.css</code></li><li>边框管配图，改 <code>--frame</code> 参数</li><li>想自己调色，打开 <code>templates/theme-tuner.html</code></li></ol>
-<p><mark>皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
-<blockquote><p>样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
-    </div>
-  </div>
-  
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+</section></div></div></div><div class="shot" data-page-node-id="l4LYQLSQUylgGxBnwOl9xK"><div class="scope" style="--card-bg: #1b1e24; --ink-strong: #f5f6f8; --ink: #d5dae2; --ink-soft: #98a3b3; --ink-faint: #6a7484; --accent: #e9b552; --mark-bg: #f2c94c; --mark-ink: #1b1e24; --quote-bg: #24282f; --divider: #333a44; --stage-bg: #0f1115; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="HDBTLIJZ0k1wrdgf1LWfk8"><div class="deck" data-page-node-id="gJnW4YA1kl8HCiH0pSbjzl"><section class="card card--content" data-page-node-id="dZPioZcvm9NwmPFhI73nYl">
+  <div class="card__head" data-page-node-id="qWeoOTdG2Bylnwjo3aV3CO"><h2 class="card__title" data-page-node-id="Yp7nPbZAviahWvk18bOi99">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="0xqmCwfXlRIqVO89WzlIC8">
+    <div class="card__content" data-page-node-id="xHiRdVP5SSZPMxfa4khALX">
+<figure data-page-node-id="gQulvs3xBqCUylaBXmPDZ3"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="chshCNn3exUOo2Pl91M9PH"></figure>
+<p data-page-node-id="Pptx23trMSKcXCZHga0R7i"><code data-page-node-id="Kz8vtAcmVHMX0Idm7hnNrO">--frame</code> 有三个值：<code data-page-node-id="1clWPNT9INfmAMywBKR0VA">hairline</code> 细描边、<code data-page-node-id="HM7bvI6oQ0hFdnO4rKJoQd">paper</code> 相纸框、<code data-page-node-id="Uk5MYp5GsJBjeOUUKVrpQ0">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   
 </section></div></div></div></div>
 </article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>松墨<span class="badge">深色底</span></h3>
-    <p class="tpl__file">assets/themes/松墨.css</p>
-    <p class="tpl__desc">深墨绿底 + 干枯玫瑰粉强调 + 薄荷高亮，低饱和莫兰迪</p>
-    <p class="tpl__use"><b>适合</b>　生活方式 / 植物·户外 / 品牌调性 / 安静的深色表达</p>
-    <div class="sw"><span style="background:#43664a" title="--card-bg: #43664a"></span><span style="background:#ededed" title="--ink: #ededed"></span><span style="background:#d9b8b8" title="--accent: #d9b8b8"></span><span style="background:#d4f9e9" title="--mark-bg: #d4f9e9"></span></div>
-    <ul class="ratio"><li><span>--accent 序号/标签</span><b class="ok">3.55:1 ✓</b></li><li><span>--ink-soft 副标题</span><b class="ok">4.68:1 ✓</b></li><li><span>--ink 正文</span><b class="warn">5.54:1 △</b></li></ul>
-    <p class="tpl__cmd"><code>--theme 松墨</code></p>
-    <p class="tpl__alias">别名：松墨 / 墨绿 / 森绿 / pine / forest / deepgreen</p>
+<article class="tpl" data-page-node-id="RQxDECCdxiRr6591rG3RDo">
+  <div class="tpl__info" data-page-node-id="erGXnLiBHq3rxkworEL4Dm">
+    <h3 data-page-node-id="1IoCikeLxZ49ovT5uJTx1q">暮紫<span class="badge" data-page-node-id="E2Oj1MDQEcgJ7SFBvnERvd">深色底</span></h3>
+    <p class="tpl__file" data-page-node-id="w93GBwiOU97LTqx5AdHGIH">assets/themes/暮紫.css</p>
+    <p class="tpl__desc" data-page-node-id="VJyZyF8a8LFHgprKYE3kdc">深靛蓝底 + 奶油白字 + 粉强调，冷底暖字的对照</p>
+    <p class="tpl__use" data-page-node-id="vP5kvyR6O77ALkdAY2VdFC"><b data-page-node-id="ahuWdEcN6wwvoHplxwxW6S">适合</b>　情绪 / 观点 / 女性向内容 / 想要柔和一点的个人表达</p>
+    <div class="sw" data-page-node-id="7a4vkrOZDRsAQIAex3lRiW"><span style="background:#4e506c" title="--card-bg: #4e506c" data-page-node-id="fvkCrdoDutxxPyDX3aXiEL"></span><span style="background:#fff0e3" title="--ink: #fff0e3" data-page-node-id="bHKuKtc96l2Oi9FajeAuL9"></span><span style="background:#f7d0d1" title="--accent: #f7d0d1" data-page-node-id="fxFwciAluuTwN0REQMBRJ7"></span><span style="background:#f8d7d7" title="--mark-bg: #f8d7d7" data-page-node-id="R0HUyralChzM7hZv9o0raq"></span></div>
+    <ul class="ratio" data-page-node-id="GzrZfCZm87R4X0qvaGXBuE"><li data-page-node-id="c2hjMSAinF4GnGIfUVnW1b"><span data-page-node-id="K1wXi2jHYjlgRh9zpCnMsw">--accent 序号/标签</span><b class="ok" data-page-node-id="0CnHuNeS0yD66bBulGiSQP">5.54:1 ✓</b></li><li data-page-node-id="rvtUhPCBvI2V0M8x7ZGmgm"><span data-page-node-id="1EB6TtMrGFx3zoT9yBw257">--ink-soft 副标题</span><b class="ok" data-page-node-id="LEDTStIGGdcLr0IKUGumR3">4.72:1 ✓</b></li><li data-page-node-id="IWhJFJEhcRYnsHl7o04P5A"><span data-page-node-id="41HEVOOCC2fW7BB4XZ9Vd8">--ink 正文</span><b class="ok" data-page-node-id="auaD9IrpRZc389FaGDY7MN">7.00:1 ✓</b></li></ul>
+    <p class="tpl__cmd" data-page-node-id="vDxpRzycTRIs7ES19rPfp6"><code data-page-node-id="tkzo8Y7wmOvY9NIc3F4sA8">--theme 暮紫</code></p>
+    <p class="tpl__alias" data-page-node-id="fxotaLHFBJZyqsdAezqpAK">别名：暮紫 / 紫霞 / 紫夜 / dusk / purple / violet</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--cover">
-  <div class="card__head"><span class="card__kicker">样式参考</span><h1 class="card__title">一套样张，看遍所有皮肤</h1></div>
-  <div class="card__body">
-    <div class="card__content">
-<blockquote><p>下面三页在所有皮肤/边框下<strong>共用同一份内容</strong>，只有样式在变</p></blockquote>
+  <div class="tpl__cards" data-page-node-id="TqsA56qx9tYrZRGK6i6Y2u"><div class="shot" data-page-node-id="vCA2CmpXZ6UDdXAAn8QaSD"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="QvqqFS37SRZjg2Psv3ftqM"><div class="deck" data-page-node-id="WL9u98VWAn43CtdFUMBonH"><section class="card card--cover" data-page-node-id="d0gITCz6xh95KRRQAVB5vA">
+  <div class="card__head" data-page-node-id="8OSFA2aCaKwCcWDeBExDFB"><span class="card__kicker" data-page-node-id="R6t3bXEWviFAr6ge1lZSkL">样式参考</span><h1 class="card__title" data-page-node-id="5w9LoEpj8ffTTIRC9fapgT">一套样张，看遍所有皮肤</h1></div>
+  <div class="card__body" data-page-node-id="WlvwJSxdvySO6QdVqveXCj">
+    <div class="card__content" data-page-node-id="103MAvdSyJwRFOBOefb5iL">
+<blockquote data-page-node-id="jcyRHniyNE0NEcco0w090S"><p data-page-node-id="paxHGWBKulovnir9PDICNq">下面三页在所有皮肤/边框下<strong data-page-node-id="tSWMieylJrHIsdAExG8Me8">共用同一份内容</strong>，只有样式在变</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">一份内容，多种皮肤</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<p>换皮肤只要加一个 <code>--theme</code> 参数，稿子一个字都不用改。</p>
-<ol><li>皮肤管配色，改 <code>assets/themes/*.css</code></li><li>边框管配图，改 <code>--frame</code> 参数</li><li>想自己调色，打开 <code>templates/theme-tuner.html</code></li></ol>
-<p><mark>皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
-<blockquote><p>样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
+</section></div></div></div><div class="shot" data-page-node-id="qhCkRK46xMCqKFioYnHB9Z"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="8doXzZ1Wf0GxHHU0JEYBbJ"><div class="deck" data-page-node-id="w7t654G9jPafwthHLEoJMf"><section class="card card--content card--airy" data-page-node-id="YbQSKDBPwHiroT0ruf8lzM">
+  <div class="card__head" data-page-node-id="m6GBiVB6qkjSpwFLaNBmX0"><h2 class="card__title" data-page-node-id="jFNrwEH7RQSUdHz7iwKyVU">一份内容，多种皮肤</h2></div>
+  <div class="card__body" data-page-node-id="MKsNtF7Uu9tGtlUW9gXbz9">
+    <div class="card__content" data-page-node-id="K9XQ3HJfZgSabwrohFRgYE">
+<p data-page-node-id="V9Pkc6Fg7znEm6opU96HJB">换皮肤只要加一个 <code data-page-node-id="5EjChCQo5d1o9VJpyNZL6k">--theme</code> 参数，稿子一个字都不用改。</p>
+<ol data-page-node-id="BIxEi41B772ind0mDYxMP2"><li data-page-node-id="V2DRmZNtShyuzKamr7DBaX">皮肤管配色，改 <code data-page-node-id="FBXySZxnCH54VagUdLkcFc">assets/themes/*.css</code></li><li data-page-node-id="69t2RO9IPU0Nlqq1jtNpVa">边框管配图，改 <code data-page-node-id="9bjJy8DhgTsBTzlt7fGmZD">--frame</code> 参数</li><li data-page-node-id="rNAz7L3tWBSPnWystYayNi">想自己调色，打开 <code data-page-node-id="uYrf3dYPxbiOxpIw2tKyS8">templates/theme-tuner.html</code></li></ol>
+<p data-page-node-id="Z0hw9KLlyYlbfLnK1FiKbo"><mark data-page-node-id="jvL5dwa0o85vkPqvt7MLuB">皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
+<blockquote data-page-node-id="yIPWmECmbylQIWqZo4l2fQ"><p data-page-node-id="myIMjeBcOey5ScFLf5svsa">样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
     </div>
   </div>
   
-</section></div></div></div><div class="shot"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px;"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+</section></div></div></div><div class="shot" data-page-node-id="VXKpB9qcfHYXi7pUdu53yU"><div class="scope" style="--card-bg: #4e506c; --ink-strong: #fff0e3; --ink: #fff0e3; --ink-soft: #d1c7c4; --ink-faint: #918d99; --accent: #f7d0d1; --mark-bg: #f8d7d7; --mark-ink: #4e506c; --quote-bg: #575872; --divider: #6c6b80; --stage-bg: #2c2e3e; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="W3ljjCBtDVljBwRGR0Kqlb"><div class="deck" data-page-node-id="WsoKj5YfbAdt8uE4NDj9ci"><section class="card card--content" data-page-node-id="owPp6LqybwEJMqsGNiUMNF">
+  <div class="card__head" data-page-node-id="9bSfaMzeYkIHjkdjcqkUFO"><h2 class="card__title" data-page-node-id="8OooiDBWMcXeqmPILngp5O">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="dRNv60x9Ro5G6HagyJXEJK">
+    <div class="card__content" data-page-node-id="T6DCgblqBsiF42VK0JJjzq">
+<figure data-page-node-id="KL5R1JEIRdHPd6qxyUGJWQ"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="Dz8BwR1sSHfj1FBpknLSjn"></figure>
+<p data-page-node-id="VBIex2C47AIOFSRn4gRxot"><code data-page-node-id="nEYhTIggvUAtpGDSElWy8r">--frame</code> 有三个值：<code data-page-node-id="obXAs7EkNhh5gHmIyIiZ98">hairline</code> 细描边、<code data-page-node-id="grWuzSxeUnV2IXAbz7TNXS">paper</code> 相纸框、<code data-page-node-id="s5XfElPCMPumfL4lWSvAfv">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+    </div>
+  </div>
+  
+</section></div></div></div></div>
+</article>
+<article class="tpl" data-page-node-id="miaE8ClVhmtVPlj0xFp2Tx">
+  <div class="tpl__info" data-page-node-id="YFAqbZnL3J1c3FG7c1BK5b">
+    <h3 data-page-node-id="aH4GSRnZeZaGB9D3OFH1sG">普鲁士蓝<span class="badge" data-page-node-id="FaCxLvFOlFsZQOkSnjDIGO">米白底</span></h3>
+    <p class="tpl__file" data-page-node-id="RZOoNbhIyb8YBCzwXiSJ0G">assets/themes/普鲁士蓝.css</p>
+    <p class="tpl__desc" data-page-node-id="3DIPHFi4ARJyySWFOJkKx8">米白底 + 普鲁士蓝与藏青，低饱和冷调，纸感克制</p>
+    <p class="tpl__use" data-page-node-id="K2NNSoX79D0ScLVtZMfM2Z"><b data-page-node-id="7dcLj4nD18wnV2yykKcIrQ">适合</b>　穿搭 / 生活美学 / 品牌调性 / 复古质感内容</p>
+    <div class="sw" data-page-node-id="zThAXyW0GHh8MeWoAGpjyO"><span style="background:#efefe7" title="--card-bg: #efefe7" data-page-node-id="3Y1soZRC182aDrixmDDNAb"></span><span style="background:#35506e" title="--ink: #35506e" data-page-node-id="EUR4uOqXQ1WAiIH9Oz0GRD"></span><span style="background:#617a99" title="--accent: #617a99" data-page-node-id="59j7DymKfvxFkEtpx0IiCL"></span><span style="background:#b9c4c6" title="--mark-bg: #b9c4c6" data-page-node-id="eV69UZYsfuOuSy1Cr2ZsCz"></span></div>
+    <ul class="ratio" data-page-node-id="oQyVPL9RWcHqPDMNVIodwv"><li data-page-node-id="A8QEV7wpTV3oCG9qv5s0NH"><span data-page-node-id="Hk4gpUVJT5gIiEVuEYYB9L">--accent 序号/标签</span><b class="ok" data-page-node-id="frK8zKaByCQBzoDo6yETio">3.82:1 ✓</b></li><li data-page-node-id="UxeHW5ml3ikpew1rZolZRa"><span data-page-node-id="2hP6dxzpY5c5fmcfhUeEl2">--ink-soft 副标题</span><b class="ok" data-page-node-id="KIZonDJs6z3TU8c6kFegKI">4.71:1 ✓</b></li><li data-page-node-id="TOwTItShLtjohrJ0BkVCYA"><span data-page-node-id="fmN2fIN2b8WCopHfIlpQ6C">--ink 正文</span><b class="ok" data-page-node-id="ma57JF8EN91yGOnOB4pNzK">7.20:1 ✓</b></li></ul>
+    <p class="tpl__cmd" data-page-node-id="z4Rk2MmdrnJwBWODqxdjou"><code data-page-node-id="40tCL9l1GFOCaXovaGxQzl">--theme 普鲁士蓝</code></p>
+    <p class="tpl__alias" data-page-node-id="ILdi2Aak1TDSboBAbMzOs0">别名：普鲁士蓝 / 雾霾蓝 / 藏青 / prussian / prussianblue / prussian-blue / navy</p>
+  </div>
+  <div class="tpl__cards" data-page-node-id="OvswOphR5BAVi4jQwRlqJp"><div class="shot" data-page-node-id="o4GHoLBXAmnHEMhIEIKcFI"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="DbgLDX5CDkAnaAszkrDxzt"><div class="deck" data-page-node-id="1AecDU4XqMMVfUK54zsvbL"><section class="card card--cover" data-page-node-id="HtlJh0Q8dXUypJesdnh1Yj">
+  <div class="card__head" data-page-node-id="SV4VDGgEpwiybOed676SqJ"><span class="card__kicker" data-page-node-id="la1FF2FAbUmDGWdBQGFf2E">样式参考</span><h1 class="card__title" data-page-node-id="O8mXXHArGSK6BiwMO0kcj7">一套样张，看遍所有皮肤</h1></div>
+  <div class="card__body" data-page-node-id="N5SbLBeg97B7gh2yTh9diO">
+    <div class="card__content" data-page-node-id="TOAxGFWqkOupUHpbAlasPA">
+<blockquote data-page-node-id="oTs10z8Ssx3wsXqRrJgbqW"><p data-page-node-id="mBFDS7tSAbzQfhfT91fGPm">下面三页在所有皮肤/边框下<strong data-page-node-id="2XumH3EErtMfBLcvIF31kt">共用同一份内容</strong>，只有样式在变</p></blockquote>
+    </div>
+  </div>
+  
+</section></div></div></div><div class="shot" data-page-node-id="CQCSFCIAJP5YvsCSYuITsw"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="RMi2kJCwsIaNkpk2VjyqrF"><div class="deck" data-page-node-id="e8xnttcRGbLjyLeU2DxYSs"><section class="card card--content card--airy" data-page-node-id="4yWHYTMyff9WGiwsiCv2JI">
+  <div class="card__head" data-page-node-id="2ipcaMIMgxT4Htv6SMAndR"><h2 class="card__title" data-page-node-id="85CmgLnHktYimUsfPDLsy5">一份内容，多种皮肤</h2></div>
+  <div class="card__body" data-page-node-id="AO2uCLfxql1GLfh3l9wp82">
+    <div class="card__content" data-page-node-id="yAVTjLygqIY4g10VNfvERB">
+<p data-page-node-id="yw2LNEhiJTE9sKUtPP9oLC">换皮肤只要加一个 <code data-page-node-id="dkSaEzEbeOUIrZmtYKC3TD">--theme</code> 参数，稿子一个字都不用改。</p>
+<ol data-page-node-id="pxYdqrfQQSk1HuxZNwAZEX"><li data-page-node-id="rvazLCbsDoSfL6Q9qFNfoZ">皮肤管配色，改 <code data-page-node-id="xuPCr9H0hoosImIvkQPx8W">assets/themes/*.css</code></li><li data-page-node-id="C7G8zQOxE4fUygOxcuiE4S">边框管配图，改 <code data-page-node-id="O6i1ggNfpFWb0szIFKjyQr">--frame</code> 参数</li><li data-page-node-id="0n6FBvgv7FFIGxUgnYKP1f">想自己调色，打开 <code data-page-node-id="aPKsk1expqZ1zJsTVEdnR3">templates/theme-tuner.html</code></li></ol>
+<p data-page-node-id="ibjNdwQAJyiCVLNf33DfFL"><mark data-page-node-id="jKRpWe7Csgh4BIehzni6Eq">皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
+<blockquote data-page-node-id="aFxScdYrNwEsfR4UvCRaZB"><p data-page-node-id="uoQ1HWuUkIfek1sVMQlDhn">样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
+    </div>
+  </div>
+  
+</section></div></div></div><div class="shot" data-page-node-id="aORoRUZpmaiKB3ZJEFC6Zz"><div class="scope" style="--card-bg: #efefe7; --ink-strong: #0f315e; --ink: #35506e; --ink-soft: #556c83; --ink-faint: #8e9da8; --accent: #617a99; --mark-bg: #b9c4c6; --quote-bg: #ffffff; --divider: #b9c4c6; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="6I4LOnrY4xZb6grqn1lTHI"><div class="deck" data-page-node-id="cxqRz0Q4SrBjBiBKvSuDMK"><section class="card card--content" data-page-node-id="t6rorZ0hmfy7iCNvCiJ35J">
+  <div class="card__head" data-page-node-id="spG32bbjCciGJ0x1sOteW5"><h2 class="card__title" data-page-node-id="Fezn86Fn5YJarVZaLemAa4">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="jJAlLanW17RfpPScT28SFd">
+    <div class="card__content" data-page-node-id="2YhZa0YKJ86BG7KvcSEsCN">
+<figure data-page-node-id="mXhydD9ZHc8kTsbESocLD4"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="9BILHMoxMaFA78jakVF5WO"></figure>
+<p data-page-node-id="rX56QHJtsNvtIsxw6HluQs"><code data-page-node-id="m5ZHzh3J2T2WZIzRJUpPjV">--frame</code> 有三个值：<code data-page-node-id="pIJVNi5so98alcKON9Y3TQ">hairline</code> 细描边、<code data-page-node-id="UFnBBaxXkA1Wlr3xhsFthp">paper</code> 相纸框、<code data-page-node-id="FCwrcaL33OXGJz7KTuTmXP">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+    </div>
+  </div>
+  
+</section></div></div></div></div>
+</article>
+<article class="tpl" data-page-node-id="QEjqIpDkBFKEzk6387oK2M">
+  <div class="tpl__info" data-page-node-id="0kxbWGfcz76TOgeuSb5rh5">
+    <h3 data-page-node-id="9rWZhKREgUGpalnGxdOpXc">松墨<span class="badge" data-page-node-id="C5mLYMCo5BHjoAc5dM6wef">深色底</span></h3>
+    <p class="tpl__file" data-page-node-id="C1gf1TWtUfUjzJmYQDo18W">assets/themes/松墨.css</p>
+    <p class="tpl__desc" data-page-node-id="RMQbNq6gISCnSeyB7G6seC">深墨绿底 + 干枯玫瑰粉强调 + 薄荷高亮，低饱和莫兰迪</p>
+    <p class="tpl__use" data-page-node-id="cPP2aukzBn9LVmL5hKfmeO"><b data-page-node-id="cO76lOyYBGSfquFl21u46m">适合</b>　生活方式 / 植物·户外 / 品牌调性 / 安静的深色表达</p>
+    <div class="sw" data-page-node-id="jEY0CISGELyf9zf19Jcd7d"><span style="background:#43664a" title="--card-bg: #43664a" data-page-node-id="ah5SrP1d0fHJhNG38gJ0UQ"></span><span style="background:#ededed" title="--ink: #ededed" data-page-node-id="oMjmF93054yDEaWYg0pVmJ"></span><span style="background:#d9b8b8" title="--accent: #d9b8b8" data-page-node-id="bRBI6ZDUAWF1tDQfKfqoSG"></span><span style="background:#d4f9e9" title="--mark-bg: #d4f9e9" data-page-node-id="URBDFagCy0CkzLbZ9OULRL"></span></div>
+    <ul class="ratio" data-page-node-id="xATJSubA2zioGtgug6ST8V"><li data-page-node-id="mxl2AO1dc2ceEklxEmYpEA"><span data-page-node-id="sh4fwrGjwEtD9yczCNHWa6">--accent 序号/标签</span><b class="ok" data-page-node-id="Ase2JbNcWypyLV3IEI702z">3.55:1 ✓</b></li><li data-page-node-id="qNBuiAj6FCMmZaetVIwFa4"><span data-page-node-id="ia52TwHMyq3SXcWiszjo0H">--ink-soft 副标题</span><b class="ok" data-page-node-id="eE81fxxMzDTVXICXGRMopD">4.68:1 ✓</b></li><li data-page-node-id="q1PSWorFCROaBtOqrgbj0B"><span data-page-node-id="7vrARqvqu8twePEyFVBJAP">--ink 正文</span><b class="warn" data-page-node-id="smJGHRTBvUUl8eutaUcxyM">5.54:1 △</b></li></ul>
+    <p class="tpl__cmd" data-page-node-id="8a0Eu6y5RYWu3HeQmXb59r"><code data-page-node-id="fRuElpYLsCwNP9sCDCgWpd">--theme 松墨</code></p>
+    <p class="tpl__alias" data-page-node-id="SDhNilTdZEvvda40i8ePgF">别名：松墨 / 墨绿 / 森绿 / pine / forest / deepgreen</p>
+  </div>
+  <div class="tpl__cards" data-page-node-id="DUcnQSEucDltHKHXrrZT6g"><div class="shot" data-page-node-id="MpbfIOYk5WnLneEvMliDA2"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="BYNaGw8sAjLfRCaFJbC9gy"><div class="deck" data-page-node-id="ABVF3YS4EXzA4ErbLZ56dN"><section class="card card--cover" data-page-node-id="C3u3RUiJieflxxdaBk8Vie">
+  <div class="card__head" data-page-node-id="hBWnzddaxXziOWHpsvmr2A"><span class="card__kicker" data-page-node-id="LczeglT3dXXCCFUepMXRAB">样式参考</span><h1 class="card__title" data-page-node-id="xEVARy7EAJW9xCLWoeCeRr">一套样张，看遍所有皮肤</h1></div>
+  <div class="card__body" data-page-node-id="BCGraPokmch97QTBOKBSp4">
+    <div class="card__content" data-page-node-id="NAsx2T9aYXeyzyeB0QUwrv">
+<blockquote data-page-node-id="P0IA3a8THYvLZCZ3CL1FVq"><p data-page-node-id="opbfdBWDXoMtEFgChKyiTb">下面三页在所有皮肤/边框下<strong data-page-node-id="yCZlNojYlvibVGy8b1iAXJ">共用同一份内容</strong>，只有样式在变</p></blockquote>
+    </div>
+  </div>
+  
+</section></div></div></div><div class="shot" data-page-node-id="BEv6nz69uorKEOWy2CKi8X"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="CeErmBZMolaiMTmv27X3d2"><div class="deck" data-page-node-id="k7M4WndoVsbZgYtDf8DW69"><section class="card card--content card--airy" data-page-node-id="ZAGEWSpmVLfsPNEuBr6hu4">
+  <div class="card__head" data-page-node-id="XHNd2C7u1ZZlaewHuuL0Gr"><h2 class="card__title" data-page-node-id="H5YiDAfSSR7BXQoPjAoelQ">一份内容，多种皮肤</h2></div>
+  <div class="card__body" data-page-node-id="ZV9AFBWMFqyvBmxEcTAkIA">
+    <div class="card__content" data-page-node-id="Ta6MBVaSqIlvHx0RTl3qWM">
+<p data-page-node-id="KCHinEGIRloBBQJk6eyYEO">换皮肤只要加一个 <code data-page-node-id="CQx8rk4vD3USm4wjshqIOQ">--theme</code> 参数，稿子一个字都不用改。</p>
+<ol data-page-node-id="AckDWP1Huk3TlTz4uM3JiE"><li data-page-node-id="eGEPQqu7egERnxODeZ01PD">皮肤管配色，改 <code data-page-node-id="VJ2P2tJi5ESTD0bcxJZzca">assets/themes/*.css</code></li><li data-page-node-id="tTnnrO7lzEZ4n7tWY9hGWR">边框管配图，改 <code data-page-node-id="uJhEsckXJ2Nc6aA2o8sbMe">--frame</code> 参数</li><li data-page-node-id="e2hBWHUoEdCjLYxj9Kuwh8">想自己调色，打开 <code data-page-node-id="dvSieHzI1VPNiEErklFcqk">templates/theme-tuner.html</code></li></ol>
+<p data-page-node-id="PZMcmnaAb7pF420AhEYSux"><mark data-page-node-id="IGaedb1TvXCNYNrHNf8Ndk">皮肤文件只写配色，字号间距都在 base.css 里</mark>，所以换个底不会连带把排版搞歪。</p>
+<blockquote data-page-node-id="fhgBZCj8tWTmrAxuO7bhxK"><p data-page-node-id="iXMs74cfo0cUIadQwYP54I">样张统一，才看得出风格差异。各用各的稿子比，比出来的不是皮肤，是随机。</p></blockquote>
+    </div>
+  </div>
+  
+</section></div></div></div><div class="shot" data-page-node-id="3esGr5qXgdFa88QMFCLIfC"><div class="scope" style="--card-bg: #43664a; --ink-strong: #ffffff; --ink: #ededed; --ink-soft: #d5ddd6; --ink-faint: #96b19c; --accent: #d9b8b8; --mark-bg: #d4f9e9; --mark-ink: #43664a; --quote-bg: #4c6d53; --divider: #638069; --stage-bg: #2e4a35; --card-shadow: 0 18px 48px rgba(0, 0, 0, 0.45); --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="fJ1ptGwZwLONNckrQfDPAl"><div class="deck" data-page-node-id="KKnatI4LYHCzjRFshCJjp6"><section class="card card--content" data-page-node-id="2oOkUolEJxFXIRU1EWli3J">
+  <div class="card__head" data-page-node-id="TlibVsUAArc8cvsJcmeD6r"><h2 class="card__title" data-page-node-id="VXKsC4iBzmxZiIhBRWvpkN">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="w0btWFrXnalDO3EHdvQP2d">
+    <div class="card__content" data-page-node-id="DuLuW33U23EKuzxzKhbGpF">
+<figure data-page-node-id="EF3oF5EJb6EEPfr5zbsoab"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="PyKHMLrzgxuJnQNWTSj0ak"></figure>
+<p data-page-node-id="ollunG74R27zGcnznDCl7H"><code data-page-node-id="6FC1wCzVbzrhFCKmj8vhAv">--frame</code> 有三个值：<code data-page-node-id="B4JpVVM7torjWmGakijNax">hairline</code> 细描边、<code data-page-node-id="dR3xAlRlvmDN6HKdAAKh0U">paper</code> 相纸框、<code data-page-node-id="EORBeGwehD1J9XpmB01atF">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   
 </section></div></div></div></div>
 </article>
 
-<h2>配图边框</h2>
-<p class="hint">同一份样张、同一套皮肤（默认奶油蓝），只换边框。肤色/底色不同的皮肤下，边框色会跟着皮肤的变量走。</p>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>细描边</h3>
-    <p class="tpl__file">assets/frames/hairline.css</p>
-    <p class="tpl__desc">8px 细线框住配图，克制不抢戏</p>
-    <p class="tpl__use"><b>适合</b>　配图本身是浅色 UI 截图时</p>
-    <ul class="ratio">
-      <li><span>边框粗细</span><b>8px</b></li>
-      <li><span>边框颜色</span><b>var(--divider)</b></li>
-      <li><span>投影</span><b>无</b></li>
-      <li><span>本样张页数</span><b>3</b></li>
+<h2 data-page-node-id="m9LgY9O8A5GNQDVKiB1qrD">配图边框</h2>
+<p class="hint" data-page-node-id="45uuBksUy3j8q3rcHGXtvj">同一份样张、同一套皮肤（默认奶油蓝），只换边框。肤色/底色不同的皮肤下，边框色会跟着皮肤的变量走。<br data-page-node-id="HK5fAQeWXYaOWWTV2G93WS">
+这里的样张按 <b data-page-node-id="SZ3D32FkiFQIxC05vmhi5u">50%</b> 显示（上面的皮肤样张是 19.4%）—— 细描边只有 8px，按 19.4% 缩完只剩 1.5px，和「无边框」看不出区别；最左边那张 <b data-page-node-id="zYdTlFdnuDa2NNkDLD3nyz">实尺示意</b> 不缩放，是判断粗细的准尺。</p>
+<article class="tpl" data-page-node-id="udXqfXgEesECziAVNK4XdF">
+  <div class="tpl__info" data-page-node-id="WUFWn9uOII5pqS5LbCTnXv">
+    <h3 data-page-node-id="3YKP4vwD3KZKHNkYJebCbe">细描边</h3>
+    <p class="tpl__file" data-page-node-id="dDLxCq3hBWZFC5WMapNuxe">assets/frames/hairline.css</p>
+    <p class="tpl__desc" data-page-node-id="id3cJzgMZj1B0hIUK8HflB">8px 细线框住配图，克制不抢戏</p>
+    <p class="tpl__use" data-page-node-id="1gtcCORmQ4bXoVwY8ilJvu"><b data-page-node-id="pHHpSDpMGaQN6taNRfkiBd">适合</b>　配图本身是浅色 UI 截图时</p>
+    <ul class="ratio" data-page-node-id="TAhBfMIoRuj1sFLKISqWz5">
+      <li data-page-node-id="jyoD1GdBT32uusH3xXLLMT"><span data-page-node-id="q8wQ9REm5Qg2Rr1GLBCzEF">边框粗细</span><b data-page-node-id="KOR5WpGsCGTxjBniMpV73s">8px</b></li>
+      <li data-page-node-id="DipHtHMJZ3UBEF6n7o2Que"><span data-page-node-id="UK92ouWasnElhoLy6SCLCC">边框颜色</span><b data-page-node-id="pQJNVfYbR3P8F7eAh3g8lt">var(--divider) → #a5c0db</b></li>
+      <li data-page-node-id="EAyOKcvW2CxY5IhOkHOn6a"><span data-page-node-id="4Ao4e7e8jqrSONhUeAmGsx">投影</span><b data-page-node-id="TTLeS0KJvGVYGzr5Rpj1DF">无</b></li>
+      <li data-page-node-id="Bdoc2gJeLA7Fhk0oFbpVZV"><span data-page-node-id="CfvD3v3crWsIr7SrQny8Cw">本样张页数</span><b data-page-node-id="oHaO3PxQnE1MulOxP8g7SE">3</b></li>
     </ul>
-    <p class="tpl__cmd"><code>--frame hairline</code></p>
-    <p class="tpl__alias">别名：hairline / a / 细描边 / 细线</p>
+    <p class="tpl__cmd" data-page-node-id="VPZZYcJcgfdkJHSb4mOWRZ"><code data-page-node-id="oUmlDCkjrVhtmbhHigvje5">--frame hairline</code></p>
+    <p class="tpl__alias" data-page-node-id="9hx7Wm7CGDCEe6alETkrAe">别名：hairline / a / 细描边 / 细线</p>
+    <p class="tpl__alias" data-page-node-id="36l4lu5omwxAAbOT1ZPd5I">样张配色：默认皮肤（奶油蓝）</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+  <div class="tpl__cards" data-page-node-id="vdLidiNKEMyRB5C4pjerzZ"><div class="fs" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="k8mPyv1sAHL5DqNssPoxtV">
+  <div class="fs__stage" data-page-node-id="wBHJd5KgLVuwaH3lxQC2m0"><div class="fs__box" data-page-node-id="1vFv1kXE5na5EYM8pRuHhM"></div></div>
+  <p class="fs__cap" data-page-node-id="wkAPHVVIRaATErByFaBDgW">实尺示意（1:1，不缩放）<br data-page-node-id="4cDgFQdUvKyZ8V8kPjlS0V">边框真的就是这么粗</p>
+</div><div class="shot shot--big" data-page-node-id="PBaj1bklkXikP0rwJhTeJb"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 8px; --img-border-color: var(--divider); --img-shadow: none;" data-page-node-id="dlIlNDvWZFyBAhDRUopl4m"><div class="deck" data-page-node-id="C2ou1y9dw5gAp9yJ9Aje8A"><section class="card card--content" data-page-node-id="S84nVT3aksxu8drRkC6FsR">
+  <div class="card__head" data-page-node-id="GWtIUxk5MPDzQvCRPMYaff"><h2 class="card__title" data-page-node-id="Q07ztAj2IFmaAH7rgeru4s">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="igWbeoR3qrBGoWinwrWBA3">
+    <div class="card__content" data-page-node-id="Nj4OuypjJBk2MpT5NNPTDv">
+<figure data-page-node-id="PefAGXodpAge5kjjMyxg3b"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="AYPrnlCazwitwF6yWfjFp2"></figure>
+<p data-page-node-id="WMSR2Sjwa4caUxOsTuMtkX"><code data-page-node-id="XSkr1iO1qEzdjEIEGAogbA">--frame</code> 有三个值：<code data-page-node-id="Z51ODC8Fo1huS7ly95IcoW">hairline</code> 细描边、<code data-page-node-id="HgCMMJLa1wplhO4e1AAYpB">paper</code> 相纸框、<code data-page-node-id="cklq6oSiOOpinbaK0qKooM">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   
 </section></div></div></div></div>
 </article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>相纸框</h3>
-    <p class="tpl__file">assets/frames/paper.css</p>
-    <p class="tpl__desc">粗边填卡片底色 + 投影，图「浮」起来</p>
-    <p class="tpl__use"><b>适合</b>　想让配图独立成块、和正文拉开距离时</p>
-    <ul class="ratio">
-      <li><span>边框粗细</span><b>40px</b></li>
-      <li><span>边框颜色</span><b>var(--card-bg)</b></li>
-      <li><span>投影</span><b>有</b></li>
-      <li><span>本样张页数</span><b>3</b></li>
+<article class="tpl" data-page-node-id="mNskakX8lbU12kcEDg2m1A">
+  <div class="tpl__info" data-page-node-id="nGOOijBKT5lDdDGEQeAm6B">
+    <h3 data-page-node-id="niMP7BpE7tEtnAjD9SKRJu">相纸框</h3>
+    <p class="tpl__file" data-page-node-id="zYk2ICzuIZ1Wlc82SjmTRi">assets/frames/paper.css</p>
+    <p class="tpl__desc" data-page-node-id="ODxbqr9Wkg9TGvj1TsRtTd">粗边填卡片底色 + 投影，图「浮」起来</p>
+    <p class="tpl__use" data-page-node-id="AR0BQaDp9uKmb9avERTrRn"><b data-page-node-id="NmLYntkWXpaB4d7AeOkcT5">适合</b>　想让配图独立成块、和正文拉开距离时</p>
+    <ul class="ratio" data-page-node-id="qDfqnvepuAiJOw4h5dWeen">
+      <li data-page-node-id="FbYshELTsCYOu8vqxrx4Ng"><span data-page-node-id="ogM17BfXQe8tl48ZnDDtWx">边框粗细</span><b data-page-node-id="SXvYeBj58SnfatnhQCMeLr">40px</b></li>
+      <li data-page-node-id="lJPiDQ38fVkyaPbyEDLweE"><span data-page-node-id="IyTBpjTOPeOjmeAdye58U0">边框颜色</span><b data-page-node-id="h7mKLEk26KNLtciok1zGLW">var(--card-bg) → #fcf9e6</b></li>
+      <li data-page-node-id="v0lHUkW9hr19NPvngttyTx"><span data-page-node-id="fSoKp4Ill3Hz3GsLKlOx4Z">投影</span><b data-page-node-id="rw4OyMTk5PABf2US4OaAaq">有</b></li>
+      <li data-page-node-id="2hHkHAJ8jcJmkkEeu9RpR8"><span data-page-node-id="hpEH9xd2NzUBsgqvmyNlwe">本样张页数</span><b data-page-node-id="lBxt9MVF2Klld1fv21PxMN">3</b></li>
     </ul>
-    <p class="tpl__cmd"><code>--frame paper</code></p>
-    <p class="tpl__alias">别名：paper / c / 相纸 / 相纸框 / 白框 / 相纸白框</p>
+    <p class="tpl__cmd" data-page-node-id="kGcJAuvpbvuIViXsMpm6oR"><code data-page-node-id="Az4nCXv6TRQuNIWY38w9Ro">--frame paper</code></p>
+    <p class="tpl__alias" data-page-node-id="LKfpOY3XDnnCURnU3G64Du">别名：paper / c / 相纸 / 相纸框 / 白框 / 相纸白框</p>
+    <p class="tpl__alias" data-page-node-id="QBNJkchCCVAAJpJne9lqHb">样张配色：默认皮肤（奶油蓝）</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--img-border-w: 40px; --img-border-color: var(--card-bg); --img-shadow: 0 14px 34px rgba(23, 32, 45, 0.18);"><div class="deck"><section class="card card--content">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+  <div class="tpl__cards" data-page-node-id="mrDs9h6zeEmUefZigTLT61"><div class="fs" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 40px; --img-border-color: var(--card-bg); --img-shadow: 0 14px 34px rgba(23, 32, 45, 0.18);" data-page-node-id="3CtJSa5h4wtFY41SJoPopI">
+  <div class="fs__stage" data-page-node-id="SO1oNc6gPt5RsS3gjCoskx"><div class="fs__box" data-page-node-id="5yOObqYlm26EA2KifKw9ar"></div></div>
+  <p class="fs__cap" data-page-node-id="79QFwcDjBanokTVa6ykf5s">实尺示意（1:1，不缩放）<br data-page-node-id="6Gww4bHQmPrGRl6BE3hvnF">边框真的就是这么粗</p>
+</div><div class="shot shot--big" data-page-node-id="9DCwGE6yI6FaD2Dxmox32f"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 40px; --img-border-color: var(--card-bg); --img-shadow: 0 14px 34px rgba(23, 32, 45, 0.18);" data-page-node-id="pAYtsZ5OhDF1jSqs3LXvyr"><div class="deck" data-page-node-id="M6e5sYakkXMbKQmgLFGh9y"><section class="card card--content" data-page-node-id="cGDCTMBnEaqGUBJDB6RIqE">
+  <div class="card__head" data-page-node-id="YBOJsEumv4XT0MFHERMjtZ"><h2 class="card__title" data-page-node-id="9kbygrosu5Mq2AHTwMD8Dw">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="Y3gEK2WAWd8P36lMlWPvCc">
+    <div class="card__content" data-page-node-id="9Q1Q0OqAo4SAr5f7DWGjQz">
+<figure data-page-node-id="jSZoVmMpA1p5cMqeAjiZYE"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="ZJyPDbqiO00QDgTnOPfkIl"></figure>
+<p data-page-node-id="Az8PXPBjdYPzZjlTLcCGRB"><code data-page-node-id="whkViGJRguBezwwpHnpAf3">--frame</code> 有三个值：<code data-page-node-id="vmU4nhF40CrceKooQaJVf3">hairline</code> 细描边、<code data-page-node-id="DGPIQYcONr1ftEHxFDSmcG">paper</code> 相纸框、<code data-page-node-id="0rEG1DpEl5IF233BV4MwLz">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   
 </section></div></div></div></div>
 </article>
-<article class="tpl">
-  <div class="tpl__info">
-    <h3>无边框</h3>
-    <p class="tpl__file">assets/frames/none.css</p>
-    <p class="tpl__desc">配图光边贴着版面，什么都不加</p>
-    <p class="tpl__use"><b>适合</b>　配图自带留白/阴影，或本身就是整块设计时</p>
-    <ul class="ratio">
-      <li><span>边框粗细</span><b>0px</b></li>
-      <li><span>边框颜色</span><b>transparent</b></li>
-      <li><span>投影</span><b>无</b></li>
-      <li><span>本样张页数</span><b>3</b></li>
+<article class="tpl" data-page-node-id="aQ12DfGDQICnNHjYbVEgGG">
+  <div class="tpl__info" data-page-node-id="xniTDR8Kn3Ose87ufVMKcI">
+    <h3 data-page-node-id="73tFgYDCkSsBWRnSM7y3q5">无边框</h3>
+    <p class="tpl__file" data-page-node-id="edpDyrBQSkICDGDsEOKilN">assets/frames/none.css</p>
+    <p class="tpl__desc" data-page-node-id="6f68hpDvKVZPOytobaDZdN">配图光边贴着版面，什么都不加</p>
+    <p class="tpl__use" data-page-node-id="AGHRou4dT9tLnmm6fQ4lk0"><b data-page-node-id="cTku3HErpA4uEWBaLIQzA7">适合</b>　配图自带留白/阴影，或本身就是整块设计时</p>
+    <ul class="ratio" data-page-node-id="tLPZDGUyJTZOGOGriIL40Z">
+      <li data-page-node-id="G8ZMbANIPbRcK49BSt2gZA"><span data-page-node-id="D1VzRYE8gWAt84teaNiinO">边框粗细</span><b data-page-node-id="kuBjF3wreCk6WRm6KLlPaO">0px</b></li>
+      <li data-page-node-id="CY0TFwbOoQN0jcZgRszBQC"><span data-page-node-id="fknDeE3LTUkvTnBHGqvtBE">边框颜色</span><b data-page-node-id="u3txuvH5Yrx1i0K04gDNKB">transparent</b></li>
+      <li data-page-node-id="2qCa2vXGw9EwB1ImHcI2fv"><span data-page-node-id="JAcEUTAuy9ctMoHehBHk6Z">投影</span><b data-page-node-id="35uCGRzVmGepe8u6LwU2UP">无</b></li>
+      <li data-page-node-id="TJkLdiwek4gWsqTUlytr1h"><span data-page-node-id="J8DWpDNENWJeRNdstsUkdC">本样张页数</span><b data-page-node-id="pOeTtgHIqQsvzBybFY0xa3">3</b></li>
     </ul>
-    <p class="tpl__cmd"><code>--frame none</code></p>
-    <p class="tpl__alias">别名：none / 无 / 无边框 / 不要边框</p>
+    <p class="tpl__cmd" data-page-node-id="e3ozkTacyTv1u2bvjg2ptc"><code data-page-node-id="ppYQfF5imxvWuXbEvpAn8n">--frame none</code></p>
+    <p class="tpl__alias" data-page-node-id="JPWTOgf2C78i4wsAgvyG6f">别名：none / 无 / 无边框 / 不要边框</p>
+    <p class="tpl__alias" data-page-node-id="yhmduIncB8Yz8KFhUzmSyi">样张配色：默认皮肤（奶油蓝）</p>
   </div>
-  <div class="tpl__cards"><div class="shot"><div class="scope" style="--img-border-w: 0px; --img-border-color: transparent; --img-shadow: none;"><div class="deck"><section class="card card--content card--airy">
-  <div class="card__head"><h2 class="card__title">配图边框</h2></div>
-  <div class="card__body">
-    <div class="card__content">
-<figure><img src="../examples/images/sample-1.png" alt=""></figure>
-<p><code>--frame</code> 有三个值：<code>hairline</code> 细描边、<code>paper</code> 相纸框、<code>none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
+  <div class="tpl__cards" data-page-node-id="h4CEVA0v6HT3Tf3JDp0sSe"><div class="fs" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 0px; --img-border-color: transparent; --img-shadow: none;" data-page-node-id="tJHcPBnILsoy1cAQEc80so">
+  <div class="fs__stage" data-page-node-id="Zz0WjIk1lQ5FyC3hnq5RH8"><div class="fs__box" data-page-node-id="Ebaw4vFAF5u6mEoHOGUgh8"></div></div>
+  <p class="fs__cap" data-page-node-id="fRZFR8Ksm0wugQ2JCFFjLs">实尺示意（1:1，不缩放）<br data-page-node-id="l7QfYEreB06ndfVZRsy6Ff">边框真的就是这么粗</p>
+</div><div class="shot shot--big" data-page-node-id="DUwUmNLPZ3FMgQF0yCtlaM"><div class="scope" style="--card-bg: #fcf9e6; --ink-strong: #212121; --ink: #212121; --ink-soft: #7d9fbf; --ink-faint: #bcd0e2; --accent: #6b9bc7; --mark-bg: #c6dcf2; --quote-bg: #c6dcf2; --divider: #a5c0db; --body-size: 36px; --body-leading: 1.72; --quote-size: 44px; --img-border-w: 0px; --img-border-color: transparent; --img-shadow: none;" data-page-node-id="mUShdNceE008r5NmGUTmFT"><div class="deck" data-page-node-id="Evy26Tido7xAhxpZLzcPCh"><section class="card card--content card--airy" data-page-node-id="sgYXFKdyWiIzdVeSGXRPKa">
+  <div class="card__head" data-page-node-id="4PRv3IKd8HDXX5NAP5ZBhB"><h2 class="card__title" data-page-node-id="WpEHazCPW1rFX3spehH0qi">配图边框</h2></div>
+  <div class="card__body" data-page-node-id="GZ6mr2ZC5D4r1w2eEh54aF">
+    <div class="card__content" data-page-node-id="MLNp3jnL9jz3tHf7YvuSev">
+<figure data-page-node-id="mVxTmFXJUfhZjyJILvl1yP"><img src="../examples/images/sample-1.png" alt="" data-page-node-id="jEFCCzSGdiGdl0x9bwxS7s"></figure>
+<p data-page-node-id="XxLenHWUahqOUJibIoPWFQ"><code data-page-node-id="n4kDvhtoO92x5hVTW4Z6Z8">--frame</code> 有三个值：<code data-page-node-id="4ONgaPOuo7ktSihPhAySbO">hairline</code> 细描边、<code data-page-node-id="xnqiFll9YFqdQGDQ35PJXp">paper</code> 相纸框、<code data-page-node-id="l2cRCn8Nrc92ECvWFwCM9F">none</code> 无边框。 边框宽度会算进分页权重，所以换粗边框只会换页，不会溢出。</p>
     </div>
   </div>
   

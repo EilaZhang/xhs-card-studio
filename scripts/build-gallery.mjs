@@ -43,6 +43,29 @@ const TPL = loadTemplates(SKILL_ROOT);
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+/**
+ * 把「皮肤变量」和「边框变量」拼成一段内联声明。
+ *
+ * ⚠️ 边框样张**必须**带上默认皮肤的配色，否则整节都是坏的：
+ * gallery.html 只加载 base.css + gallery-shell.css，**不加载任何 assets/themes/*.css**，
+ * 所以 --card-bg / --ink / --divider 这些在边框样张的 .scope 里根本没有值。
+ * 只写 f.decls 的后果（2026-10-12 用户反馈「细边框和无边框看着差不多」时定位到）：
+ *   · --img-border-color: var(--divider)  → var() 解析失败 → 回退 transparent
+ *     → hairline 的 8px 和 none 的 0px **都是隐形边框**，两张缩略图一模一样
+ *   · paper 的 40px + var(--card-bg) 同样变透明，「相纸框」彻底失效
+ *   · --card-bg 缺失 → 卡片底色 transparent，三个样张都成了「白底黑字」
+ * 合并后两类变量名互不重叠（皮肤管配色、边框管 --img-border-*），不会打架。
+ */
+const mergeDecls = (base, over) =>
+  [String(base).replace(/;\s*$/, ''), String(over).replace(/;\s*$/, '')].filter(Boolean).join('; ') + ';';
+
+/** 把 var(--x) 就地展开成实际色值，让总览页直接显示「边框色到底是什么」而不是一句 var() */
+const resolveVars = (decls, value) =>
+  String(value).replace(/var\(\s*--([a-z0-9-]+)\s*\)/g, (whole, n) => {
+    const v = varOf(decls, n);
+    return v ? v.replace(/;\s*$/, '').trim() : whole;
+  });
+
 const lin = (c) => {
   const v = c / 255;
   return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
@@ -158,10 +181,34 @@ function buildSample(themeKey, frameKey) {
  * 页面片段
  * ================================================================== */
 
-const SCALE = 0.1944; // 1080 × 0.1944 = 210px
+const SCALE = 0.1944;    // 皮肤样张：1080 × 0.1944 = 210px
+const SCALE_BIG = 0.5;   // 边框样张：1080 × 0.5 = 540px（为什么必须放大见 shot()）
 
-function shot(cardHtml, decls) {
-  return `<div class="shot"><div class="scope" style="${esc(decls)}"><div class="deck">${cardHtml}</div></div></div>`;
+/**
+ * 一张缩略样张。big=true 走 SCALE_BIG，边框样张专用。
+ *
+ * 2026-10-12 用户反馈「细边框和无边框的示例图看起来怎么差不多」。
+ * 变量解析那层已经修过（见 mergeDecls），但缩略比例是第二层原因：
+ *   细描边只有 8px，按皮肤样张的 19.44% 缩完只剩 1.56px；
+ *   而它的边框色 --divider(#a5c0db) 压在奶油底 --card-bg(#fcf9e6) 上只有 1.78:1，
+ *   一条 1.5px、对比度 1.78:1 的浅蓝线，在缩略图里就是看不见。
+ *   「相纸框」同理：边框色 = 卡片底色（奶油压奶油），只剩一圈若隐若现的投影。
+ * 放大到 50% 后 8px → 4px，粗细才读得出来。
+ */
+function shot(cardHtml, decls, big = false) {
+  return `<div class="shot${big ? ' shot--big' : ''}"><div class="scope" style="${esc(decls)}"><div class="deck">${cardHtml}</div></div></div>`;
+}
+
+/**
+ * 边框「实尺示意」：不缩放，1:1 画一块配图，边框就是它真实的像素宽度。
+ * 缩略图受比例所限，这张小图是不受比例影响的那把尺子 —— 8px / 40px / 0px 一眼可比。
+ * 内块用 gallery 自己的白底模拟一张浅色截图，外框用 --card-bg，正是真实场景里的对比关系。
+ */
+function frameScaleDemo(mergedDecls) {
+  return `<div class="fs" style="${esc(mergedDecls)}">
+  <div class="fs__stage"><div class="fs__box"></div></div>
+  <p class="fs__cap">实尺示意（1:1，不缩放）<br>边框真的就是这么粗</p>
+</div>`;
 }
 
 function ratiosHtml(decls) {
@@ -200,7 +247,10 @@ function themeBlock(t, cards) {
 </article>`;
 }
 
-function frameBlock(f, cards, plan) {
+function frameBlock(f, cards, plan, mergedDecls) {
+  const borderColor = resolveVars(mergedDecls, varOf(f.decls, 'img-border-color'));
+  const rawColor = varOf(f.decls, 'img-border-color');
+  const colorCell = borderColor === rawColor ? esc(rawColor) : `${esc(rawColor)} → ${esc(borderColor)}`;
   return `<article class="tpl">
   <div class="tpl__info">
     <h3>${esc(f.name)}</h3>
@@ -209,14 +259,15 @@ function frameBlock(f, cards, plan) {
     <p class="tpl__use"><b>适合</b>　${esc(f.use)}</p>
     <ul class="ratio">
       <li><span>边框粗细</span><b>${esc(varOf(f.decls, 'img-border-w'))}</b></li>
-      <li><span>边框颜色</span><b>${esc(varOf(f.decls, 'img-border-color'))}</b></li>
+      <li><span>边框颜色</span><b>${colorCell}</b></li>
       <li><span>投影</span><b>${varOf(f.decls, 'img-shadow') === 'none' ? '无' : '有'}</b></li>
       <li><span>本样张页数</span><b>${plan.count}</b></li>
     </ul>
     <p class="tpl__cmd"><code>--frame ${esc(f.key)}</code></p>
     <p class="tpl__alias">别名：${esc(f.aliases.join(' / '))}</p>
+    <p class="tpl__alias">样张配色：默认皮肤（奶油蓝）</p>
   </div>
-  <div class="tpl__cards">${cards.join('')}</div>
+  <div class="tpl__cards">${frameScaleDemo(mergedDecls)}${cards.join('')}</div>
 </article>`;
 }
 
@@ -237,19 +288,38 @@ function main() {
   const ratioNotes = TPL.themes.flatMap((t) => checkRatioNotes(t.css, t.decls, t.file));
 
   // 皮肤：每套都跑一遍，取它自己的分页结果（不同皮肤分页可能不同）
+  // 样张是按默认边框（hairline）构建的，所以 .scope 里也要带上边框变量 ——
+  // 否则缩略图会少画那圈 8px 细边，和 `--theme X` 的真实产物对不上（同 mergeDecls 注释）
+  const hairline = TPL.frames.find((f) => f.key === 'hairline') || TPL.frames[0];
   const themeBlocks = TPL.themes.map((t) => {
     const { cards } = buildSample(t.key, 'hairline');
-    return themeBlock(t, cards.map((c) => shot(c, t.decls)));
+    return themeBlock(t, cards.map((c) => shot(c, mergeDecls(t.decls, hairline.decls))));
   });
 
   // 边框：统一用默认皮肤，只换边框 —— 同一份内容才好比
+  // 注意 mergedDecls：边框样张的 .scope 里必须同时带上默认皮肤变量，
+  // 否则 var(--divider) / var(--card-bg) 解析不到值（详见 mergeDecls 注释）
+  const defaultTheme = TPL.themes.find((t) => t.key === 'default') || TPL.themes[0];
   const frameBlocks = TPL.frames.map((f) => {
     const { cards, plan } = buildSample('default', f.key);
+    const merged = mergeDecls(defaultTheme.decls, f.decls);
     // 只展示带配图的那一页，边框差异才看得出
     const figIdx = cards.findIndex((c) => c.includes('<img'));
     const pick = figIdx > -1 ? [cards[figIdx]] : cards.slice(-1);
-    return frameBlock(f, pick.map((c) => shot(c, f.decls)), plan);
+    return frameBlock(f, pick.map((c) => shot(c, merged, true)), plan, merged);
   });
+
+  // 回归护栏：边框样张必须真的画出边框。
+  // 宽度 > 0 却解析成 transparent / 解析不到（还是 var(...) 原文），
+  // 就说明 .scope 里的变量没配齐 —— 正是 2026-10-12「细描边和无边框长得一样」那次。
+  for (const f of TPL.frames) {
+    const w = parseFloat(varOf(f.decls, 'img-border-w')) || 0;
+    if (w <= 0) continue;
+    const color = resolveVars(mergeDecls(defaultTheme.decls, f.decls), varOf(f.decls, 'img-border-color')).trim();
+    if (!color || color === 'transparent' || color.startsWith('var(')) {
+      warnings.push(`边框「${f.name}」声明了 ${w}px 边框，但边框色解析为「${color}」→ 样张里看不见边框`);
+    }
+  }
 
   // 安全网：产物里若仍残留 file:// 绝对路径，说明有技能目录之外的文件被引用了
   // （历史上真出过一次：outputs/ 里的 HTML 泄漏了本机用户名和私人目录结构）
@@ -313,12 +383,25 @@ body.gal {
 .ratio .ok { color: var(--gal-ok); }
 .ratio .warn { color: var(--gal-warn); }
 
-.tpl__cards { display: flex; flex-wrap: wrap; gap: 14px; }
-.shot { width: 210px; height: 280px; overflow: hidden; border-radius: 8px;
+.tpl__cards { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+/* 样张与实尺示意都不许被 flex 压扁 —— 压了就会把放大后的卡片裁掉，边框又白画了 */
+.shot { flex: 0 0 auto; width: 210px; height: 280px; overflow: hidden; border-radius: 8px;
   border: 1px solid var(--gal-border); background: var(--gal-surface); }
 .shot .scope { width: 1080px; transform: scale(${SCALE}); transform-origin: top left; }
+/* 边框样张：放大到 50%，否则 8px 的细描边缩完只剩 1.5px（见 shot() 注释） */
+.shot--big { width: ${Math.round(1080 * SCALE_BIG)}px; height: ${Math.round(1440 * SCALE_BIG)}px; }
+.shot--big .scope { transform: scale(${SCALE_BIG}); }
 .scope .deck { flex-direction: row; gap: 0; padding: 0; }
 .shot .card { box-shadow: none; }  /* 出图里本来就没有投影，这里也不显示 */
+
+/* 边框实尺示意（1:1）。外框 = 真实卡片底，内块 = 模拟的一张浅色截图 */
+.fs { flex: 0 0 220px; width: 220px; }
+.fs__stage { background: var(--card-bg); border-radius: 12px; padding: 24px; }
+.fs__box { width: 172px; height: 110px; box-sizing: border-box; border-radius: var(--radius, 24px);
+  background: var(--gal-surface);
+  border: var(--img-border-w) solid var(--img-border-color);
+  box-shadow: var(--img-shadow); }
+.fs__cap { margin: 7px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--gal-ink-faint); }
 </style>
 </head>
 <body class="gal">
@@ -336,7 +419,8 @@ ${ratioNotes.length ? `<div class="warnbox warnbox--note">
 ${themeBlocks.join('\n')}
 
 <h2>配图边框</h2>
-<p class="hint">同一份样张、同一套皮肤（默认奶油蓝），只换边框。肤色/底色不同的皮肤下，边框色会跟着皮肤的变量走。</p>
+<p class="hint">同一份样张、同一套皮肤（默认奶油蓝），只换边框。肤色/底色不同的皮肤下，边框色会跟着皮肤的变量走。<br>
+这里的样张按 <b>50%</b> 显示（上面的皮肤样张是 19.4%）—— 细描边只有 8px，按 19.4% 缩完只剩 1.5px，和「无边框」看不出区别；最左边那张 <b>实尺示意</b> 不缩放，是判断粗细的准尺。</p>
 ${frameBlocks.join('\n')}
 </body>
 </html>

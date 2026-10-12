@@ -129,7 +129,7 @@ node "$SKILL/scripts/render.mjs" /tmp/demo/cards.html --out /tmp/demo/png
 | `松墨`（深色底） | 深墨绿底 + 干枯玫瑰粉强调 | 生活方式 / 植物·户外 / 安静的深色表达 |
 
 英文别名也能用：`default` / `dark` / `dusk` / `prussian` / `pine`（以及 `深色`、`夜色`、`紫霞`、`雾霾蓝`、`藏青`、`墨绿` 等，完整列表见 `--theme` 报错时的提示）。
-**21 种皮肤 × 边框组合的实际效果见 [`docs/gallery.html`](docs/gallery.html)。**
+**15 种皮肤 × 边框组合的实际效果见 [`docs/gallery.html`](docs/gallery.html)。**
 
 > **新增一套皮肤不用改代码**：`cp assets/themes/default.css assets/themes/你的名字.css`，
 > 改配色，再在文件头部写好 `@theme-meta`（名字/别名/摘要），`--theme 你的名字` 立刻可用。

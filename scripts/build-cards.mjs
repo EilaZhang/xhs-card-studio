@@ -132,13 +132,25 @@ function parseWikiEmbed(raw) {
 const INLINE_IMG = /!\[\[[^\]]+\]\]|!\[[^\]]*\]\([^)\s]+(?:\s+"[^"]*")?\)/g;
 
 function splitTextAndImages(text) {
+  // 行内代码里的写法是「语法示例」，不是真嵌入：`![[图.png]]` 这种必须原样留在文字里。
+  // 不掩码的话它会被当真图 —— 而它根本不存在，拿不到尺寸 → 回退 380 权重
+  // （比一页容量 345 还大），症状是那一页只剩半句话，后半段被一个不存在的图挤走。
+  const codes = [];
+  // 正则里的捕获组不能省：写成 /`[^`]+`/ 时，回调第二个参数拿到的是 **offset（数字）**，
+  // 于是「21」这种字符偏移量会被当成代码内容印到卡片上（实测踩过）。
+  const masked = String(text).replace(/`([^`]+)`/g, (_m, code) => {
+    codes.push(code);
+    return `\u0001${codes.length - 1}\u0001`;
+  });
+  const restore = (s) => s.replace(/\u0001(\d+)\u0001/g, (_m, n) => `\`${codes[Number(n)]}\``);
+
   const out = [];
   let last = 0;
   INLINE_IMG.lastIndex = 0;
-  let m = INLINE_IMG.exec(text);
+  let m = INLINE_IMG.exec(masked);
   while (m) {
-    const before = text.slice(last, m.index).trim();
-    if (before) out.push({ type: 'paragraph', text: before });
+    const before = masked.slice(last, m.index).trim();
+    if (before) out.push({ type: 'paragraph', text: restore(before) });
     const wiki = parseWikiEmbed(m[0]);
     if (wiki) {
       out.push({ type: 'image', alt: wiki.alt, src: wiki.src, width: wiki.width });
@@ -147,10 +159,10 @@ function splitTextAndImages(text) {
       if (std) out.push({ type: 'image', alt: std[1], src: std[2] });
     }
     last = m.index + m[0].length;
-    m = INLINE_IMG.exec(text);
+    m = INLINE_IMG.exec(masked);
   }
-  const tail = text.slice(last).trim();
-  if (tail) out.push({ type: 'paragraph', text: tail });
+  const tail = masked.slice(last).trim();
+  if (tail) out.push({ type: 'paragraph', text: restore(tail) });
   return out.length ? out : [{ type: 'paragraph', text }];
 }
 
@@ -637,6 +649,14 @@ function inline(text, baseDir) {
   const tokens = [];
   let s = String(text);
 
+  // 行内代码最优先掩码：`![[图.png]]` / `==高亮==` 这种写在反引号里的是**语法示例**，
+  // 不能被后面的图片、链接、强调规则吃掉（与 splitTextAndImages 同一处理）。
+  const codes = [];
+  s = s.replace(/`([^`]+)`/g, (_m, code) => {
+    codes.push(code);
+    return `\u0001${codes.length - 1}\u0001`;
+  });
+
   s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, (_m, alt, src) => {
     tokens.push(`<img src="${esc(resolveAsset(src, baseDir))}" alt="${esc(alt)}">`);
     return `\u0000${tokens.length - 1}\u0000`;
@@ -657,7 +677,6 @@ function inline(text, baseDir) {
 
   s = esc(s);
 
-  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   s = s.replace(/==([^=]+)==/g, '<mark>$1</mark>');
   s = s.replace(/(?<![*\w])\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
@@ -669,6 +688,9 @@ function inline(text, baseDir) {
   // 注意：改了这条之后，中文句子里夹着写的 `_强调_` 不再生效，改用 *强调*。
   const WORDY = '\\w\\u3400-\\u4dbf\\u4e00-\\u9fff\\uf900-\\ufaff\\u3040-\\u30ff\\uac00-\\ud7af';
   s = s.replace(new RegExp(`(?<![_${WORDY}])_([^_\\n]+)_(?![_${WORDY}])`, 'g'), '<em>$1</em>');
+
+  // 强调规则全部跑完再还原行内代码 —— 放在它们前面的话，代码里的 == / ** 会被误当标记
+  s = s.replace(/\u0001(\d+)\u0001/g, (_m, n) => `<code>${esc(codes[Number(n)])}</code>`);
 
   s = s.replace(/\u0000(\d+)\u0000/g, (_m, n) => tokens[Number(n)]);
   return s;
