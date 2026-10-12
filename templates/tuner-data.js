@@ -36,31 +36,6 @@ window.__XHS_TPL__ = {
       }
     },
     {
-      "key": "知识风",
-      "name": "知识风",
-      "badges": "白底红",
-      "slug": "knowledge",
-      "aliases": [
-        "知识风",
-        "干净知识风",
-        "knowledge",
-        "clean"
-      ],
-      "summary": "纯白底 + 红强调，干净利落",
-      "order": 2,
-      "decls": {
-        "--card-bg": "#ffffff",
-        "--ink-strong": "#16181d",
-        "--ink": "#2f343c",
-        "--ink-soft": "#5c646f",
-        "--ink-faint": "#9aa3ad",
-        "--accent": "#d9483b",
-        "--mark-bg": "#ffe9a8",
-        "--quote-bg": "#f7f8fa",
-        "--divider": "#e6eaee"
-      }
-    },
-    {
       "key": "暗夜",
       "name": "暗夜",
       "badges": "深色底",
@@ -91,31 +66,6 @@ window.__XHS_TPL__ = {
       }
     },
     {
-      "key": "苔绿",
-      "name": "苔绿",
-      "badges": "浅绿",
-      "slug": "sage",
-      "aliases": [
-        "苔绿",
-        "鼠尾草",
-        "sage",
-        "moss"
-      ],
-      "summary": "浅鼠尾草底 + 苔绿强调，四套里最安静的一套",
-      "order": 4,
-      "decls": {
-        "--card-bg": "#f2f5ee",
-        "--ink-strong": "#1f2a22",
-        "--ink": "#2b3830",
-        "--ink-soft": "#5f7064",
-        "--ink-faint": "#a3b0a6",
-        "--accent": "#4a7c59",
-        "--mark-bg": "#cfe3b8",
-        "--quote-bg": "#e7eee1",
-        "--divider": "#c3cfc2"
-      }
-    },
-    {
       "key": "暮紫",
       "name": "暮紫",
       "badges": "深色底",
@@ -143,6 +93,70 @@ window.__XHS_TPL__ = {
         "--divider": "#6c6b80",
         "--stage-bg": "#2c2e3e",
         "--card-shadow": "0 18px 48px rgba(0, 0, 0, 0.45)"
+      }
+    },
+    {
+      "key": "普鲁士蓝",
+      "name": "普鲁士蓝",
+      "badges": "米白底",
+      "slug": "prussian",
+      "aliases": [
+        "普鲁士蓝",
+        "雾霾蓝",
+        "藏青",
+        "prussian",
+        "prussianblue",
+        "prussian-blue",
+        "navy"
+      ],
+      "summary": "米白底 + 普鲁士蓝与藏青，低饱和冷调，纸感克制",
+      "order": 6,
+      "decls": {
+        "--card-bg": "#efefe7",
+        "--ink-strong": "#0f315e",
+        "--ink": "#35506e",
+        "--ink-soft": "#556c83",
+        "--ink-faint": "#8e9da8",
+        "--accent": "#617a99",
+        "--mark-bg": "#b9c4c6",
+        "--quote-bg": "#ffffff",
+        "--divider": "#b9c4c6",
+        "--body-size": "36px",
+        "--body-leading": "1.72",
+        "--quote-size": "44px"
+      }
+    },
+    {
+      "key": "松墨",
+      "name": "松墨",
+      "badges": "深色底",
+      "slug": "pine",
+      "aliases": [
+        "松墨",
+        "墨绿",
+        "森绿",
+        "pine",
+        "forest",
+        "deepgreen"
+      ],
+      "summary": "深墨绿底 + 干枯玫瑰粉强调 + 薄荷高亮，低饱和莫兰迪",
+      "order": 7,
+      "decls": {
+        "--card-bg": "#43664a",
+        "--ink-strong": "#ffffff",
+        "--ink": "#ededed",
+        "--ink-soft": "#d5ddd6",
+        "--ink-faint": "#96b19c",
+        "--accent": "#d9b8b8",
+        "--mark-bg": "#d4f9e9",
+        "--mark-ink": "#43664a",
+        "--quote-bg": "#4c6d53",
+        "--divider": "#638069",
+        "--stage-bg": "#2e4a35",
+        "--card-shadow": "0 18px 48px rgba(0, 0, 0, 0.45)",
+        "--body-size": "36px",
+        "--body-leading": "1.72",
+        "--quote-size": "44px"
       }
     }
   ],

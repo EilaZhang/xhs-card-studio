@@ -135,5 +135,5 @@ node "$SKILL/scripts/build-cards.mjs" examples/demo-post.md --out outputs/demo
 | 每页容量 | 默认按卡片高度自动算，一般不用管。想手动干预：`--max-chars 300`（切更碎）或 `420`（装更满） |
 | 某页只有一张图、太空 | 会自动试着并进相邻页；还不行就把相邻的文字挪过来 |
 | 配图边框风格 | 出图时加 `--frame paper`（相纸框）/ `--frame none`（无边框），不写就是细描边 |
-| 配色字体 | 打开 `templates/theme-tuner.html` 调，或改 `assets/themes/default.css`（奶油蓝，默认皮肤）。想整套换：`--theme 知识风` |
+| 配色字体 | 打开 `templates/theme-tuner.html` 调，或改 `assets/themes/default.css`（奶油蓝，默认皮肤）。想整套换：`--theme 暮紫` |
 | 只重渲某一页 | `render.mjs ... --only 3` |

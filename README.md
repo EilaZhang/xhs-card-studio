@@ -7,10 +7,10 @@
 
 <p align="center">
   <img src="docs/preview/theme-cream.png" width="18%" alt="奶油蓝（默认）：奶油黄底 + 淡蓝点缀">
-  <img src="docs/preview/theme-knowledge.png" width="18%" alt="知识风：纯白底 + 红强调">
   <img src="docs/preview/theme-night.png" width="18%" alt="暗夜：深炭蓝底 + 琥珀强调">
-  <img src="docs/preview/theme-sage.png" width="18%" alt="苔绿：浅鼠尾草底 + 苔绿强调">
   <img src="docs/preview/theme-dusk.png" width="18%" alt="暮紫：深靛蓝底 + 奶油白字 + 粉强调">
+  <img src="docs/preview/theme-prussian.png" width="18%" alt="普鲁士蓝：米白底 + 普鲁士蓝与藏青">
+  <img src="docs/preview/theme-pine.png" width="18%" alt="松墨：深墨绿底 + 干枯玫瑰粉强调">
 </p>
 
 <p align="center"><sub><b>5 套内置皮肤</b> —— 同一份稿件、同一种版式，只有配色在变。</sub></p>
@@ -45,7 +45,7 @@
 | **智能分页（双轨）** | 自动按卡片实际可用高度切；也可以用 `---`、`#` 标题、手写页码 `1 2 3` 手动控制 |
 | **Obsidian 原生支持** | `![[图.png]]` 嵌入、`==高亮==`、手写数字页码都认。附件从稿件目录逐级向上找，笔记在子目录、图在 vault 根也不用挪 |
 | **三层样式体系** | `base.css` 结构 + 共用基准值 → `themes/*.css` 只写配色 → `frames/*.css` 配图边框。换皮肤不动结构、不动排版 |
-| **5 套内置皮肤** | 奶油蓝 / 知识风 / 暗夜（深色底）/ 苔绿 / 暮紫（深色底），都能过对比度阈值。新增皮肤只需加一个 css 文件，**不用改代码** |
+| **5 套内置皮肤** | 奶油蓝 / 暗夜（深色底）/ 暮紫（深色底）/ 普鲁士蓝 / 松墨（深色底），都能过对比度阈值。新增皮肤只需加一个 css 文件，**不用改代码** |
 | **可视化调参台** | 浏览器打开 `templates/theme-tuner.html`，一键套用任意内置皮肤再逐项微调，实时看 4 张真卡片效果，**不需要写 CSS**。皮肤清单跟着 `assets/themes/` 目录走，加皮肤不用改它 |
 | **配图边框预设** | `hairline`（细描边）/ `paper`（相纸框）/ `none`（无边框），中英文名都认。边框宽度算进分页权重，不会溢出 |
 | **自动校验** | 出图后读 PNG 头校验尺寸，不符合 1080×1440 直接报错 —— 不给你静默的废图 |
@@ -123,13 +123,13 @@ node "$SKILL/scripts/render.mjs" /tmp/demo/cards.html --out /tmp/demo/png
 | `--theme` | 说明 | 适合 |
 | --- | --- | --- |
 | `奶油蓝`（默认） | 奶油黄底 + 淡蓝点缀 | 通用内容 / 知识分享 / 日常记录 |
-| `知识风` | 纯白底 + 红强调 | 干货 / 教程 / 方法论 |
 | `暗夜` | 深炭蓝底 + 琥珀强调 | 观点输出 / 深夜向内容 |
-| `苔绿` | 浅鼠尾草底 + 苔绿强调 | 生活记录 / 阅读笔记 / 自然·植物类 |
 | `暮紫` | 深靛蓝底 + 奶油白字 + 粉强调 | 情绪 / 观点 / 女性向内容 / 想要柔和一点的表达 |
+| `普鲁士蓝` | 米白底 + 普鲁士蓝与藏青 | 穿搭 / 生活美学 / 品牌调性 / 复古质感内容 |
+| `松墨`（深色底） | 深墨绿底 + 干枯玫瑰粉强调 | 生活方式 / 植物·户外 / 安静的深色表达 |
 
-英文别名也能用：`default` / `knowledge` / `dark` / `sage` / `dusk`（以及 `深色`、`夜色`、`鼠尾草`、`紫霞` 等，完整列表见 `--theme` 报错时的提示）。
-**15 种皮肤 × 边框组合的实际效果见 [`docs/gallery.html`](docs/gallery.html)。**
+英文别名也能用：`default` / `dark` / `dusk` / `prussian` / `pine`（以及 `深色`、`夜色`、`紫霞`、`雾霾蓝`、`藏青`、`墨绿` 等，完整列表见 `--theme` 报错时的提示）。
+**21 种皮肤 × 边框组合的实际效果见 [`docs/gallery.html`](docs/gallery.html)。**
 
 > **新增一套皮肤不用改代码**：`cp assets/themes/default.css assets/themes/你的名字.css`，
 > 改配色，再在文件头部写好 `@theme-meta`（名字/别名/摘要），`--theme 你的名字` 立刻可用。
@@ -137,7 +137,7 @@ node "$SKILL/scripts/render.mjs" /tmp/demo/cards.html --out /tmp/demo/png
 >
 > **更省事的做法**：手里有配色卡就走 `node scripts/palette-from-image.mjs <卡> --write`，
 > 它会取色、派到 9 个槽位、算对比度自检，再把带 `@theme-meta` 的草稿落到 `_draft/`。
-> 内置的 `暮紫` 就是这么来的（见 `assets/themes/暮紫.css` 文件头）。
+> 内置的 `暮紫` / `普鲁士蓝` / `松墨` 就是这么来的（见各自的 `assets/themes/*.css` 文件头）。
 
 ## 稿件怎么写
 
@@ -213,7 +213,7 @@ xhs-card-studio/
 ├── assets/
 │   ├── base.css            结构骨架 + 所有模板共用的基准值（:root）
 │   ├── gallery-shell.css   总览页这个网页自身的配色（不影响出图）
-│   ├── themes/             皮肤（只写配色）：default / 知识风 / 暗夜 / 苔绿 / 暮紫
+│   ├── themes/             皮肤（只写配色）：default / 暗夜 / 暮紫 / 普鲁士蓝 / 松墨
 │   └── frames/             配图边框预设（独占 --img-border-*）：hairline / paper / none
 ├── templates/
 │   ├── theme-tuner.html    可视化皮肤调参台

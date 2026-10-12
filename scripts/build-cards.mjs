@@ -11,7 +11,7 @@
  * 选项:
  *   --out DIR        输出目录     默认: <稿件同级>/xhs-cards
  *   --theme NAME     皮肤名       默认: 奶油蓝（assets/themes/default.css）
- *                                 别名 知识风 / knowledge 可切到白底红强调那套
+ *                                 可用皮肤见 assets/themes/ 目录（别名写在各自 @theme-meta 里）
  *   --frame NAME     配图边框     默认: hairline（可选 hairline / paper / none）
  *   --max-chars N    每页目标字数 默认: 按卡片实际可用高度自动算（不是固定 260）
  *   --title T        覆盖标题（命令行 > front-matter）
@@ -817,10 +817,10 @@ function main() {
       '用法: node scripts/build-cards.mjs 稿件.md [--out DIR] [--theme 皮肤] [--frame 边框] [--max-chars N] [--title 标题]\n' +
         '      --theme 皮肤（默认 奶油蓝）:\n' +
         '              奶油蓝 / default      奶油黄底 + 淡蓝点缀（当前默认）\n' +
-        '              知识风 / knowledge    白底 + 红强调，原「干净知识风」\n' +
         '              暗夜   / dark         深炭蓝底 + 琥珀强调（深色底）\n' +
-        '              苔绿   / sage         浅鼠尾草底 + 苔绿强调\n' +
         '              暮紫   / dusk         深靛蓝底 + 粉强调（深色底，偏柔和）\n' +
+        '              普鲁士蓝 / prussian   米白底 + 普鲁士蓝与藏青（低饱和冷调）\n' +
+        '              松墨   / pine         深墨绿底 + 干枯玫瑰粉强调（深色底）\n' +
         '              也可指向 assets/themes/ 下自建的 <名字>.css\n' +
         '      --frame 配图边框风格（也可写中文）:\n' +
         '              hairline / 细描边   一条细线框住配图（默认）\n' +
